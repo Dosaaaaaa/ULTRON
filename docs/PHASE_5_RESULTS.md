@@ -149,6 +149,8 @@ User report: "Friday" is not heard while a song plays; Apple Music opens but doe
 
 The limited recogniser hears more at low levels but calls almost every minute of talking "friday" (19 of 20), so it was not used.
 
+Same test with the Indian English model (the other choice in Settings; the test voices are NOT Indian, so this only shows the direction): music only, start and newest-words rules both 33 / 29 / 23 / 11 / 1; music + talker, start 28 / 13 / 9 / 4 / 2, newest words 31 / 21 / 14 / 6 / 3; limited recogniser 20 false alarms in 20 clips. The new rule helps there too, but that model loses the name sooner as the music gets louder.
+
 Changes (Android 1.6.0, versionCode 9):
 - `WakeWord.late`: while other audio is playing (`AudioManager.isMusicActive`) or ULTRON is talking, the name counts wherever it appears among the words that are new since the last look. In quiet the old start-of-sentence rule is unchanged.
 - `service/Focus.kt`: hearing the name takes the audio focus (transient, assistant usage), which makes music apps pause; the chime plays and the command is heard in quiet; the focus is given back after the answer (or after 9 s with no command) and the music carries on. For "pause / stop the music" the focus is taken for good for a moment, so the app does not start again.
