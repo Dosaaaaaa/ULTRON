@@ -1,0 +1,8 @@
+# OPTIONAL launcher. Copy to ~/.local/share/applications/ultron-desktop.desktop after editing Exec.
+[Desktop Entry]
+Type=Application
+Name=ULTRON
+Comment=Personal AI
+Exec=/home/YOU/Projects/AI/ULTRON/desktop/app/.venv/bin/python -m ultron_desktop
+Terminal=false
+Categories=Utility;

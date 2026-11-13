@@ -1,0 +1,234 @@
+[
+  {
+    "name": "dragon_story#1",
+    "prompt": "Tell me a bedtime story about a dragon.",
+    "reply": "A dragon named Virel lived in a mountain cave, far from cities and noise. Each night, instead of breathing fire, Virel hummed a soft melody, one that made the stars above blink gently. The villagers would say, \"That dragon is kind,\" and they would gather under the moonlight to listen. One night, a child lost her lantern in the woods. Virel found it, wrapped it in moss, and returned it with a note: \"Light stays even when it's not seen.\" The child smiled, and from then on, she carried a small lantern, always lit. The end.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 5934,
+    "tokens": [
+      1384,
+      128
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 96,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "laugh#1",
+    "prompt": "Say something funny.",
+    "reply": "Two squirrels are in a race. One says, \"I'll take the left path!\" The other replies, \"No, I'll take the right path!\" They both run and crash into a tree. The tree says, \"I didn't even know I was in the race.\"",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 3992,
+    "tokens": [
+      1379,
+      59
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 2,
+      "words": 42,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "movie#1",
+    "prompt": "Recommend a film for tonight.",
+    "reply": "A film about a man who finds a single photograph in a trash can and traces it to a forgotten village. The story unfolds in silence, with only the wind and the sound of a clock ticking. It is called *The Last Light*.  \n\nNo more detail unless asked.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 2872,
+    "tokens": [
+      1381,
+      56
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 48,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "dog_name#1",
+    "prompt": "Suggest a name for my new dog.",
+    "reply": "Baxter.  \n\nShort, unremarkable, and unemotional. It works.  \n\nIf you want something with more character, consider names like Thor, Miso, or Scout. Each has a different tone. Choose based on what you want your dog to feel like.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 2927,
+    "tokens": [
+      1384,
+      57
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 37,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "hamlet#1",
+    "prompt": "Summarise the plot of Hamlet.",
+    "reply": "Hamlet is the son of the late King Hamlet and the nephew of the current king, King Claudius. After his father's death, Hamlet is haunted by the ghost of his father, who reveals he was murdered by Claudius, who then married Hamlet's mother. Hamlet vows to avenge his father's death. He feigns madness to conceal his intentions, while plotting to confirm Claudius's guilt through a play that reenacts the murder. When the play is performed, Claudius reacts with distress, confirming his guilt. Hamlet then confronts Claudius, who admits to the crime. In a final confrontation, Hamlet kills Claudius, but is later mortally wounded by Laertes, a son of Polonius. The play ends with the deaths of Hamlet, Claudius, Laertes, and Gertrude, leaving only Horatio alive.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 8344,
+    "tokens": [
+      1384,
+      184
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 125,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "haiku#1",
+    "prompt": "Write a haiku about winter.",
+    "reply": "Snow falls soft and still,  \nWorld hushed beneath white silence—  \nCold breath in the air.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 1430,
+    "tokens": [
+      1382,
+      22
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 15,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "analogy#1",
+    "prompt": "Explain inflation with an analogy.",
+    "reply": "A loaf of bread costs 100 units today. Tomorrow, the same loaf costs 101 units. The money you used to buy it is now worth less. Inflation is like that—prices rise, and each unit of currency buys less than before.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 3427,
+    "tokens": [
+      1410,
+      56
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 40,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "riddle#1",
+    "prompt": "Give me a riddle.",
+    "reply": "What has keys but can't open locks, has space but no room, and you can enter but can't go inside?  \nAnswer: A keyboard.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 1937,
+    "tokens": [
+      1381,
+      32
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 23,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  }
+]

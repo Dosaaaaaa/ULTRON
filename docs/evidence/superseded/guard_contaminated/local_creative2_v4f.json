@@ -1,0 +1,234 @@
+[
+  {
+    "name": "dragon_story#1",
+    "prompt": "Tell me a bedtime story about a dragon.",
+    "reply": "A dragon named Virel lived in a mountain cave, far from cities and light. Each night, he watched the stars and whispered to them, not with fire, but with songs made of wind and silence. One night, a child named Elia found the cave, not to fight the dragon, but to ask if it could hear dreams. Virel did not answer with words. Instead, he curled his tail around a stone and let it glow softly. The glow shaped the child’s dreams into stories, and from then on, every night, Elia dreamed of a dragon who listened. The dragon never flew again. It only watched, and listened, and sang. And that was enough.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 6998,
+    "tokens": [
+      1340,
+      143
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 113,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "laugh#1",
+    "prompt": "Say something funny.",
+    "reply": "A robot walks into a bar and orders a drink. The bartender says, \"We don't serve robots.\" The robot replies, \"I know, but I'm here for the ambiance.\"",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 3786,
+    "tokens": [
+      1335,
+      39
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 28,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "movie#1",
+    "prompt": "Recommend a film for tonight.",
+    "reply": "*The Midnight Library* by Matt Haig. A contemplative story about choices, regrets, and the infinite paths of life. It explores how decisions shape identity, and how one moment can open a universe of possibilities. It’s quiet, introspective, and emotionally resonant.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 4739,
+    "tokens": [
+      1337,
+      57
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 1,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 40,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "dog_name#1",
+    "prompt": "Suggest a name for my new dog.",
+    "reply": "Thorin.  \n\nSimple. Strong. A name that carries weight, like a mountain.  \n\nIf you want something softer, try Miso. If you want something playful, try Pippa. But Thorin works. It’s not flashy. It’s not loud. It’s just there. And that’s good.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 5208,
+    "tokens": [
+      1340,
+      66
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 40,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "hamlet#1",
+    "prompt": "Summarise the plot of Hamlet.",
+    "reply": "Hamlet is the son of the late King Hamlet and the nephew of King Claudius, who has married the widow. When Hamlet's father dies, he is told by the ghost of his father that Claudius murdered him. Hamlet vows to avenge his father's death and stages a play to see if Claudius reacts. When Claudius does, Hamlet confirms the truth. He then feigns madness to hide his intentions. In the end, Hamlet kills Claudius, but also kills himself, and the play ends in tragedy.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 6373,
+    "tokens": [
+      1340,
+      113
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 84,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "haiku#1",
+    "prompt": "Write a haiku about winter.",
+    "reply": "Snow falls silent,  \nWorld hushed in white stillness—  \nCold breath on glass.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 1342,
+    "tokens": [
+      1338,
+      20
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 12,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "analogy#1",
+    "prompt": "Explain inflation with an analogy.",
+    "reply": "A loaf of bread costs 100 units today. Tomorrow, the same loaf costs 101 units. The money supply has grown, but the bread hasn't. The value of money has dropped—like a shared room where more people move in, but the space stays the same. Each person's share of the room shrinks. Inflation is that shrinking share.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 4330,
+    "tokens": [
+      1366,
+      78
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 56,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "riddle#1",
+    "prompt": "Give me a riddle.",
+    "reply": "What has keys but can't open locks, has space but no room, and you can enter but can't go inside?  \nAnswer: A keyboard.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 1938,
+    "tokens": [
+      1337,
+      32
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 23,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "source": "LibriSpeech test-clean reference text",
+  "utterances": 2620,
+  "words": 52576,
+  "utterance_start_trials": 2620,
+  "utterance_start_false_accepts": 0,
+  "any_position_trials": 52576,
+  "any_position_false_accepts": 0,
+  "examples": []
+}

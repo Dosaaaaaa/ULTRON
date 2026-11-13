@@ -1,0 +1,10 @@
+ultron-by-sagar-builds/
+desktop/orb-ui/node_modules/
+desktop/orb-ui/.next/
+desktop/orb-ui/out/
+docs/evidence/
+backend/data/
+.claude/
+android/build/
+android/app/build/
+android/.gradle/

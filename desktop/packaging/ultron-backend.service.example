@@ -1,0 +1,23 @@
+# OPTIONAL. Not installed by ULTRON. Starts the backend when you log in, so reminders and the phone
+# keep working with the window closed. To use it yourself:
+#   mkdir -p ~/.config/systemd/user && cp ultron-backend.service.example ~/.config/systemd/user/ultron-backend.service
+#   edit the two paths below (and --host / TLS options if the phone should reach it, see make_lan_cert.sh)
+#   systemctl --user daemon-reload && systemctl --user enable --now ultron-backend
+#   journalctl --user -u ultron-backend -f      # logs;   systemctl --user disable --now ultron-backend  # undo
+# Runs as YOUR user with no privileges. The token stays in backend/.env (read by the app itself).
+[Unit]
+Description=ULTRON backend
+After=network-online.target
+
+[Service]
+WorkingDirectory=/home/YOU/Projects/AI/ULTRON/backend
+ExecStart=/home/YOU/Projects/AI/ULTRON/backend/.venv/bin/uvicorn app.main:app_factory --factory --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/home/YOU/Projects/AI/ULTRON/backend/data
+PrivateTmp=yes
+
+[Install]
+WantedBy=default.target

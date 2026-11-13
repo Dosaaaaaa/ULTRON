@@ -1,0 +1,246 @@
+{
+  "kind": "SYNTHETIC speech (Kokoro). Not a measurement of real-voice recall.",
+  "positives": {
+    "total": 240,
+    "vad_missed": 0,
+    "wake": 225,
+    "by_noise": {
+      "clean": [
+        119,
+        120
+      ],
+      "snr10dB": [
+        106,
+        120
+      ]
+    },
+    "by_phrase": {
+      "Ultron.": [
+        45,
+        48
+      ],
+      "Hey Ultron.": [
+        43,
+        48
+      ],
+      "Ultron, what time is it?": [
+        47,
+        48
+      ],
+      "Okay Ultron, tell me a joke.": [
+        44,
+        48
+      ],
+      "Ultron, stand by.": [
+        46,
+        48
+      ]
+    },
+    "by_voice": {
+      "am_adam": [
+        20,
+        20
+      ],
+      "am_michael": [
+        20,
+        20
+      ],
+      "am_onyx": [
+        19,
+        20
+      ],
+      "am_fenrir": [
+        19,
+        20
+      ],
+      "bm_george": [
+        19,
+        20
+      ],
+      "bm_lewis": [
+        19,
+        20
+      ],
+      "af_heart": [
+        19,
+        20
+      ],
+      "af_bella": [
+        18,
+        20
+      ],
+      "af_nicole": [
+        15,
+        20
+      ],
+      "af_sky": [
+        19,
+        20
+      ],
+      "bf_emma": [
+        19,
+        20
+      ],
+      "bf_isabella": [
+        19,
+        20
+      ]
+    },
+    "command_ok": 137,
+    "command_total": 137,
+    "misses": [
+      {
+        "voice": "am_onyx",
+        "phrase": "Hey Ultron.",
+        "speed": 0.9,
+        "noise": "snr10dB",
+        "heard": [
+          "Very Ultron."
+        ]
+      },
+      {
+        "voice": "am_fenrir",
+        "phrase": "Ultron, stand by.",
+        "speed": 1.1,
+        "noise": "snr10dB",
+        "heard": [
+          "Ultram standby."
+        ]
+      },
+      {
+        "voice": "bm_george",
+        "phrase": "Hey Ultron.",
+        "speed": 0.9,
+        "noise": "snr10dB",
+        "heard": [
+          "Pay Ultron."
+        ]
+      },
+      {
+        "voice": "bm_lewis",
+        "phrase": "Hey Ultron.",
+        "speed": 1.1,
+        "noise": "snr10dB",
+        "heard": [
+          "K-Ultra."
+        ]
+      },
+      {
+        "voice": "af_heart",
+        "phrase": "Okay Ultron, tell me a joke.",
+        "speed": 1.1,
+        "noise": "snr10dB",
+        "heard": [
+          "Okay, I'll try. Tell me a joke."
+        ]
+      },
+      {
+        "voice": "af_bella",
+        "phrase": "Okay Ultron, tell me a joke.",
+        "speed": 0.9,
+        "noise": "snr10dB",
+        "heard": [
+          "Okay, all time. Tell me the joke."
+        ]
+      },
+      {
+        "voice": "af_bella",
+        "phrase": "Ultron, stand by.",
+        "speed": 1.1,
+        "noise": "snr10dB",
+        "heard": [
+          "Ultram, standby."
+        ]
+      },
+      {
+        "voice": "af_nicole",
+        "phrase": "Ultron.",
+        "speed": 0.9,
+        "noise": "snr10dB",
+        "heard": [
+          "Ultram."
+        ]
+      },
+      {
+        "voice": "af_nicole",
+        "phrase": "Ultron.",
+        "speed": 1.1,
+        "noise": "snr10dB",
+        "heard": [
+          "Try."
+        ]
+      },
+      {
+        "voice": "af_nicole",
+        "phrase": "Ultron, what time is it?",
+        "speed": 0.9,
+        "noise": "snr10dB",
+        "heard": [
+          "What time?",
+          "Music."
+        ]
+      },
+      {
+        "voice": "af_nicole",
+        "phrase": "Okay Ultron, tell me a joke.",
+        "speed": 0.9,
+        "noise": "snr10dB",
+        "heard": [
+          "Okay, I'll try.",
+          "Tell me a joke."
+        ]
+      },
+      {
+        "voice": "af_nicole",
+        "phrase": "Okay Ultron, tell me a joke.",
+        "speed": 1.1,
+        "noise": "snr10dB",
+        "heard": [
+          "Okay, ultra. Tell me a joke."
+        ]
+      },
+      {
+        "voice": "af_sky",
+        "phrase": "Ultron.",
+        "speed": 0.9,
+        "noise": "snr10dB",
+        "heard": [
+          "Ebola"
+        ]
+      },
+      {
+        "voice": "bf_emma",
+        "phrase": "Hey Ultron.",
+        "speed": 0.9,
+        "noise": "clean",
+        "heard": [
+          "Hey, Ultraonida."
+        ]
+      },
+      {
+        "voice": "bf_isabella",
+        "phrase": "Hey Ultron.",
+        "speed": 0.9,
+        "noise": "snr10dB",
+        "heard": [
+          "K-Altron."
+        ]
+      }
+    ]
+  },
+  "confusable_negatives": {
+    "total": 240,
+    "false_accepts": 1,
+    "examples": [
+      {
+        "voice": "am_onyx",
+        "phrase": "Ultra.",
+        "heard": [
+          "Ultron."
+        ],
+        "score": 1.0
+      }
+    ]
+  },
+  "seconds": 598
+}

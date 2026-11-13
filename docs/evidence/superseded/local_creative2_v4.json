@@ -1,0 +1,218 @@
+[
+  {
+    "name": "dragon_story#1",
+    "prompt": "Tell me a bedtime story about a dragon.",
+    "reply": "A dragon named Virel lived in a mountain cave, where the air was cold and the stones were ancient. Each night, instead of breathing fire, Virel would hum a soft melody, making the stars tremble gently. The villagers said the song brought sleep to children, even when the wind howled. One night, a little girl named Lira heard the melody and fell asleep without a sound. Virel knew then that peace was not in fire, but in stillness.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 7848,
+    "tokens": [
+      1024,
+      101
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 78,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "laugh#1",
+    "prompt": "Say something funny.",
+    "reply": "Two robots entered a bar. One said, \"I'm a server.\" The other replied, \"Then you're not a robot.\" \"No,\" said the first, \"I'm a waiter.\"",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 12465,
+    "tokens": [
+      1019,
+      41
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 25,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "movie#1",
+    "prompt": "Recommend a film for tonight.",
+    "reply": "I cannot recommend films as I have no access to databases or content libraries. Please specify a genre or theme if you'd like guidance.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 5466,
+    "tokens": [
+      1021,
+      28
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 24,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "dog_name#1",
+    "prompt": "Suggest a name for my new dog.",
+    "reply": "Silas.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 5150,
+    "tokens": [
+      1024,
+      4
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 1,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "hamlet#1",
+    "prompt": "Summarise the plot of Hamlet.",
+    "reply": "Hamlet, Prince of Denmark, returns from Wittenberg to find his father dead and his mother married to his uncle, Claudius. Hamlet suspects Claudius murdered his father and seeks proof. He stages a play to mimic the murder, observing Claudius’s reaction. When Claudius reacts with guilt, Hamlet confirms his theory. Hamlet delays action, consumed by indecision. In the end, he kills Claudius, then himself, as the play concludes.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 6013,
+    "tokens": [
+      1024,
+      96
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 67,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "haiku#1",
+    "prompt": "Write a haiku about winter.",
+    "reply": "Snow falls silently,  \nWorld stills in white hush—  \nCold breath on glass.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 5015,
+    "tokens": [
+      1022,
+      20
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 12,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "analogy#1",
+    "prompt": "Explain inflation with an analogy.",
+    "reply": "A loaf of bread costs 100 units today. Next year, the same loaf costs 105 units. The money supply has grown, but the bread has not. The price of bread rises, not because bread is more expensive, but because the unit of money has lost value. Inflation is the gradual erosion of a currency’s purchasing power over time.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 6504,
+    "tokens": [
+      1050,
+      76
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 58,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "riddle#1",
+    "prompt": "Give me a riddle.",
+    "reply": "What has keys but can't open locks, has space but no room, and you can enter but can't go inside?",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 13445,
+    "tokens": [
+      1021,
+      26
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 20,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  }
+]

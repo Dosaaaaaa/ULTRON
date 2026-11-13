@@ -1,0 +1,25 @@
+{
+  "status_line": "backend: ok · qwen3:4b-instruct ✓",
+  "first_token_s": 10.7,
+  "total_s": 11.19,
+  "transcript": "YOU\nWhat is seventeen times twenty-three? Answer briefly.\n\nULTRON\n17 times 23 is 391.",
+  "engine_label": "engine: ollama/qwen3:4b-instruct",
+  "privacy_locked_in_ui": [
+    true,
+    "Local only (locked: this conversation is permanently local)"
+  ],
+  "backend_conversations": [
+    {
+      "messages": 2,
+      "local_only": true
+    }
+  ],
+  "dialog_summary": "Create <tmp>/ws/from_ui.txt (3 bytes)",
+  "file_created": "e2e",
+  "system_text_first_lines": [
+    "OS        Ubuntu 26.04.1 LTS  (kernel 7.0.0-42-generic, x86_64)",
+    "CPU       Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz  ·  12 threads",
+    "CPU load  37.9%   load avg [2.58, 1.18, 0.59]"
+  ],
+  "agent_still_running_after_ui_closed": true
+}

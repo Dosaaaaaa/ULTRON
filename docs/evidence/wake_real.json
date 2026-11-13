@@ -1,0 +1,10 @@
+{
+  "source": "LibriSpeech test-clean (REAL speech), random sample",
+  "utterances": 400,
+  "hours_of_audio": 0.831,
+  "false_accepts": 0,
+  "false_accepts_per_hour_observed": 0.0,
+  "upper_95pct_per_hour_if_zero": 3.61,
+  "details": [],
+  "wall_seconds": 481
+}

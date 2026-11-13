@@ -1,0 +1,48 @@
+# Task completion documents
+.claude/completions/**
+
+# Session files
+.claude/sessions/**
+
+# Archived documentation
+docs/archive/**
+
+# User-facing docs (not needed during dev sessions — devs have CLAUDE.md)
+CHANGELOG.md
+README.md
+CONTRIBUTING.md
+GEMINI.md
+AGENTS.md
+.cursorrules
+.windsurfrules
+.clinerules
+.roomodes
+
+# Git
+.git/**
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/**
+
+# OS
+.DS_Store
+
+# Python / FastAPI
+__pycache__/**
+*.pyc
+.venv/**
+venv/**
+.pytest_cache/**
+htmlcov/**
+ultron-by-sagar-builds/**
+graphify-out/**
+desktop/orb-ui/node_modules/**
+desktop/orb-ui/.next/**
+desktop/orb-ui/out/**
+**/.venv/**

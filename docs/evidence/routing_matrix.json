@@ -1,0 +1,86 @@
+[
+  {
+    "case": "R1 complex -> cloud(stub)",
+    "expect": "tier=cloud",
+    "result": "PASS",
+    "detail": "engine={'provider': 'stub', 'model': 'stub-cloud-model', 'tier': 'cloud'}"
+  },
+  {
+    "case": "R1b bearer header sent to cloud",
+    "expect": "auth header == configured key",
+    "result": "PASS",
+    "detail": "header matched"
+  },
+  {
+    "case": "R1c personality text identical in cloud payload",
+    "expect": "system prompt starts with personality",
+    "result": "PASS",
+    "detail": "sha-prefix-match=True"
+  },
+  {
+    "case": "R1d key absent from API response",
+    "expect": "no key in body",
+    "result": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "R2 local_only complex -> local, cloud untouched",
+    "expect": "tier=local, stub requests=0",
+    "result": "PASS",
+    "detail": "engine={'provider': 'ollama', 'model': 'qwen3:4b-instruct', 'tier': 'local'} stub_requests=0"
+  },
+  {
+    "case": "R3 cloud HTTP 500 -> fallback local",
+    "expect": "attempts cloud fail then local ok",
+    "result": "PASS",
+    "detail": "attempts=[('cloud', False, 'unavailable'), ('local', True, None)] notice=yes"
+  },
+  {
+    "case": "R4 cloud HTTP 401 -> fallback local",
+    "expect": "attempts cloud fail then local ok",
+    "result": "PASS",
+    "detail": "attempts=[('cloud', False, 'rejected'), ('local', True, None)] notice=yes"
+  },
+  {
+    "case": "R5 cloud connection refused -> fallback local",
+    "expect": "cloud unavailable then local ok",
+    "result": "PASS",
+    "detail": "attempts=[('cloud', False, 'unavailable'), ('local', True, None)]"
+  },
+  {
+    "case": "R6 cloud timeout -> fallback local",
+    "expect": "cloud timeout then local ok",
+    "result": "PASS",
+    "detail": "attempts=[('cloud', False, 'timeout'), ('local', True, None)]"
+  },
+  {
+    "case": "R7 allow_cloud=false",
+    "expect": "local, stub requests=0",
+    "result": "PASS",
+    "detail": "stub_requests=0"
+  },
+  {
+    "case": "R8 simple -> local first (auto)",
+    "expect": "tier=local, stub requests=0",
+    "result": "PASS",
+    "detail": "engine=local"
+  },
+  {
+    "case": "R9 all engines down -> 503, nothing saved",
+    "expect": "503 and 0 conversations",
+    "result": "PASS",
+    "detail": "status=503 conversations=0"
+  },
+  {
+    "case": "R10 local_only, local down -> 503, cloud untouched",
+    "expect": "503, stub requests=0",
+    "result": "PASS",
+    "detail": "status=503 stub_requests=0"
+  },
+  {
+    "case": "R11 local_only turn content not sent to cloud on later turn",
+    "expect": "no leak",
+    "result": "PASS",
+    "detail": "cloud received the local_only note: False"
+  }
+]

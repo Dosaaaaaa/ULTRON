@@ -1,0 +1,16 @@
+# OPTIONAL. Not installed by ULTRON. To use it yourself:
+#   mkdir -p ~/.config/systemd/user && cp ultron-agent.service.example ~/.config/systemd/user/ultron-agent.service
+#   systemctl --user daemon-reload && systemctl --user enable --now ultron-agent
+# Edit the path below first. Runs as YOUR user with no privileges.
+[Unit]
+Description=ULTRON device agent (local tool broker)
+
+[Service]
+ExecStart=/home/YOU/Projects/AI/ULTRON/desktop/agent/.venv/bin/python -m ultron_agent serve
+Restart=on-failure
+NoNewPrivileges=yes
+# Deliberately NOT sandboxed with PrivateNetwork/ProtectSystem: applications the agent launches
+# inherit its namespaces, so those options would give your browser no network and no writable home.
+
+[Install]
+WantedBy=default.target

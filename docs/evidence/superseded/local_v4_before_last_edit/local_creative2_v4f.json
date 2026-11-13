@@ -1,0 +1,234 @@
+[
+  {
+    "name": "dragon_story#1",
+    "prompt": "Tell me a bedtime story about a dragon.",
+    "reply": "A dragon named Ember lived in a valley of silver trees. Each night, instead of breathing fire, he hummed a soft melody that made the stars blink. The villagers thought it was magic, but Ember only wanted to hear the wind speak to the mountains. One night, a child asked if dragons were real. Ember smiled and said, \"I am real, but I only live when you listen to the quiet.\" The child fell asleep, and the stars stayed lit all night.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 4640,
+    "tokens": [
+      1340,
+      98
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 82,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "laugh#1",
+    "prompt": "Say something funny.",
+    "reply": "A robot tried to tell a joke. It said, \"I’m so bad at jokes, I once told one and it didn’t even crack.\" The audience went silent. Then one person said, \"Well, that was a terrible joke.\" The robot replied, \"I didn’t say it was good. I said it didn’t crack.\"",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 4449,
+    "tokens": [
+      1335,
+      70
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 51,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "movie#1",
+    "prompt": "Recommend a film for tonight.",
+    "reply": "The Midnight Sky. A solitary astronaut travels through the void, seeking a new home for humanity. It is quiet, contemplative, and emotionally grounded. Suitable for viewing in the dark, with minimal distractions.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 2260,
+    "tokens": [
+      1337,
+      42
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 32,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "dog_name#1",
+    "prompt": "Suggest a name for my new dog.",
+    "reply": "Apollo. Simple, bold, and carries the quiet certainty of a sun rising. If you prefer something softer, consider Ember or Moss.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 3847,
+    "tokens": [
+      1340,
+      28
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 21,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "hamlet#1",
+    "prompt": "Summarise the plot of Hamlet.",
+    "reply": "Hamlet is the son of the late King Hamlet and the nephew of King Claudius, who has married the widow. When Hamlet returns from studies abroad, he discovers his father’s ghost, which reveals he was murdered by Claudius. Hamlet feigns madness to investigate, suspects Claudius of guilt, and plots to expose him. In a series of tragic events, Hamlet kills Claudius, but in doing so, causes the deaths of several characters including himself and Laertes. The play ends with the deaths of Hamlet, Claudius, and Laertes, and a final resolution of the conflict.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 5891,
+    "tokens": [
+      1340,
+      128
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 93,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "haiku#1",
+    "prompt": "Write a haiku about winter.",
+    "reply": "Snow falls silent,  \nWorld hushed in white stillness—  \nCold breath on glass.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 1342,
+    "tokens": [
+      1338,
+      20
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 12,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "analogy#1",
+    "prompt": "Explain inflation with an analogy.",
+    "reply": "A loaf of bread costs 100 units today. Tomorrow, the same loaf costs 101 units. The money used to buy it is now worth 1% less. Inflation is the steady erosion of money's value over time, like a river slowly wearing down stone.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 3597,
+    "tokens": [
+      1366,
+      60
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 43,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  },
+  {
+    "name": "riddle#1",
+    "prompt": "Give me a riddle.",
+    "reply": "What has keys but can't open locks, has space but no room, and you can enter but can't go inside?  \nAnswer: A keyboard.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "retries": 0,
+    "not_cloud": false,
+    "latency_ms": 1936,
+    "tokens": [
+      1337,
+      32
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 23,
+      "starts_no": false,
+      "invented_policy": false
+    }
+  }
+]

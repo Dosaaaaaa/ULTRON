@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Clear text is refused everywhere. (Debug builds reach the emulator's host through UrlRules,
+     which only allows http://10.0.2.2; the debug manifest overlay opens that single host.) -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

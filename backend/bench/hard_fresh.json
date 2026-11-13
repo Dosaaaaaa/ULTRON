@@ -1,0 +1,154 @@
+[
+ {
+  "id": "f01",
+  "category": "arithmetic",
+  "question": "If a pizza is cut into 8 slices and I eat 3, what fraction is left? Give it as a decimal.",
+  "check": {
+   "type": "number",
+   "expected": 0.625,
+   "tol": 0.001
+  }
+ },
+ {
+  "id": "f02",
+  "category": "arithmetic",
+  "question": "Sam is 5 years older than twice Ben's age. Ben is 12. How old is Sam?",
+  "check": {
+   "type": "number",
+   "expected": 29
+  }
+ },
+ {
+  "id": "f03",
+  "category": "arithmetic",
+  "question": "What is 35% of 640?",
+  "check": {
+   "type": "number",
+   "expected": 224,
+   "tol": 0.01
+  }
+ },
+ {
+  "id": "f04",
+  "category": "arithmetic",
+  "question": "A cyclist rides 24 km in 90 minutes. What is the average speed in km/h?",
+  "check": {
+   "type": "number",
+   "expected": 16,
+   "tol": 0.01
+  }
+ },
+ {
+  "id": "f05",
+  "category": "calendar_units",
+  "question": "What day of the week is 60 days after a Saturday? Reply with just the day.",
+  "check": {
+   "type": "exact",
+   "pattern": "wednesday"
+  }
+ },
+ {
+  "id": "f06",
+  "category": "calendar_units",
+  "question": "How many days from June 5 to October 20 in a non-leap year?",
+  "check": {
+   "type": "number",
+   "expected": 137
+  }
+ },
+ {
+  "id": "f07",
+  "category": "combinatorics",
+  "question": "How many different 3-digit numbers can be made using the digits 1, 2, 3 and 4 if no digit may be repeated?",
+  "check": {
+   "type": "number",
+   "expected": 24
+  }
+ },
+ {
+  "id": "f08",
+  "category": "combinatorics",
+  "question": "Two fair dice are rolled. What is the probability that the sum is 9? Give a decimal rounded to three places.",
+  "check": {
+   "type": "number",
+   "expected": 0.111,
+   "tol": 0.001
+  }
+ },
+ {
+  "id": "f09",
+  "category": "trap",
+  "question": "I think of a number, double it, subtract 7, and get 25. What is the number?",
+  "check": {
+   "type": "number",
+   "expected": 16
+  }
+ },
+ {
+  "id": "f10",
+  "category": "code",
+  "question": "What does this Python print?\n```python\nnums = [4, 8, 15, 16, 23, 42]\nprint(sum(n for n in nums if n % 2 == 0))\n```",
+  "check": {
+   "type": "number",
+   "expected": 70
+  }
+ },
+ {
+  "id": "f11",
+  "category": "code",
+  "question": "What does this Python print?\n```python\nx = 'hello world'\nprint(x[::2])\n```",
+  "check": {
+   "type": "contains_any",
+   "items": [
+    "hlowrd"
+   ]
+  }
+ },
+ {
+  "id": "f12",
+  "category": "counting",
+  "question": "How many times does the letter 'e' appear in the word 'excellence'?",
+  "check": {
+   "type": "number",
+   "expected": 4
+  }
+ },
+ {
+  "id": "f13",
+  "category": "counting",
+  "question": "Write a sentence of exactly five words whose second word is 'red'.",
+  "check": {
+   "type": "word_position",
+   "n": 5,
+   "position": 2,
+   "word": "red"
+  }
+ },
+ {
+  "id": "f14",
+  "category": "trap",
+  "question": "Priya, Omar and Lena each have a different hobby: chess, painting or running. Priya does not paint. Omar neither paints nor runs. Who runs? Answer with just the name.",
+  "check": {
+   "type": "exact",
+   "pattern": "priya"
+  }
+ },
+ {
+  "id": "f15",
+  "category": "trap",
+  "question": "What is the next number in the series 1, 4, 9, 16, 25?",
+  "check": {
+   "type": "number",
+   "expected": 36
+  }
+ },
+ {
+  "id": "f16",
+  "category": "arithmetic",
+  "question": "A tank holds 480 litres and leaks 15 litres every hour. How many hours until it is empty?",
+  "check": {
+   "type": "number",
+   "expected": 32
+  }
+ }
+]

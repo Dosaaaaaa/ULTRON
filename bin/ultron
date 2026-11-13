@@ -1,0 +1,496 @@
+#!/usr/bin/env python3
+"""ultron: one command for the whole product (standard library only).
+
+  ultron doctor            check everything and say what to fix
+  ultron start             start the backend in the background (if it is not up) and open the window
+  ultron stop              stop the backend that `ultron start` started
+  ultron status            what is running
+  ultron pair              make a pairing code for the phone (shows a QR code in the terminal)
+  ultron backup            copy the database to a dated backup file
+  ultron service install   (optional, asks first) start the backend when you log in
+  ultron service remove
+  ultron launcher install  add ULTRON to your applications menu (home folder only); `launcher remove` undoes it
+  ultron phone setup       make the certificate the phone needs (home folder only) and print the firewall line
+
+It never prints the API token, never changes system settings, and only touches your home folder.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import signal
+import socket
+import sqlite3
+import ssl
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+from datetime import datetime
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+BACKEND = ROOT / "backend"
+STATE = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state")) / "ultron"
+CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "ultron"
+PIDFILE = STATE / "backend.pid"
+LOGFILE = STATE / "backend.log"
+UNIT = Path.home() / ".config/systemd/user/ultron-backend.service"
+DATA = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share"))
+TLS_DIR = CONFIG / "tls"
+DESKTOP_FILE = DATA / "applications/ultron.desktop"
+ICON_FILE = DATA / "icons/hicolor/scalable/apps/ultron.svg"
+
+
+# ---------------------------------------------------------------------------- configuration
+def read_env(path: Path = BACKEND / ".env") -> dict[str, str]:
+    out: dict[str, str] = {}
+    try:
+        for line in path.read_text().splitlines():
+            key, sep, value = line.partition("=")
+            if sep and key.strip() and not key.lstrip().startswith("#"):
+                out[key.strip()] = value.strip().strip("'\"")
+    except OSError:
+        pass
+    return out
+
+
+def setting(name: str, env: dict[str, str], default: str = "") -> str:
+    return os.environ.get(name) or env.get(name) or default
+
+
+def backend_url(env: dict[str, str]) -> str:
+    return setting("ULTRON_BACKEND_URL", env, "http://127.0.0.1:8000").rstrip("/")
+
+
+def tls_cert(env: dict[str, str]) -> Path | None:
+    p = setting("ULTRON_TLS_CERT_FILE", env)
+    if p:
+        return Path(p)
+    default = TLS_DIR / "cert.pem"  # what `ultron phone setup` makes
+    return default if default.is_file() else None
+
+
+def tls_files() -> tuple[Path, Path] | None:
+    cert, key = TLS_DIR / "cert.pem", TLS_DIR / "key.pem"
+    return (cert, key) if cert.is_file() and key.is_file() else None
+
+
+def ssl_context(url: str, env: dict[str, str]) -> ssl.SSLContext | None:
+    """https to our own server: trust exactly the certificate it is configured with."""
+    if not url.startswith("https://"):
+        return None
+    cert = tls_cert(env)
+    ctx = ssl.create_default_context()
+    if cert and cert.is_file():
+        ctx = ssl.create_default_context(cafile=str(cert))
+        ctx.check_hostname = False  # the certificate itself is the pin
+    return ctx
+
+
+def call(method: str, url: str, path: str, env: dict[str, str], body: dict | None = None,
+         token: str | None = None, timeout: float = 5.0) -> tuple[int, dict | None]:  # fmt: skip
+    req = urllib.request.Request(
+        url + path,
+        method=method,
+        data=json.dumps(body).encode() if body is not None else None,
+        headers={"content-type": "application/json", **({"Authorization": f"Bearer {token}"} if token else {})},
+    )  # fmt: skip
+    try:
+        with urllib.request.urlopen(req, timeout=timeout, context=ssl_context(url, env)) as r:
+            raw = r.read()
+            return r.status, json.loads(raw) if raw else None
+    except urllib.error.HTTPError as e:
+        try:
+            return e.code, json.loads(e.read() or b"null")
+        except ValueError:
+            return e.code, None
+    except (urllib.error.URLError, OSError, ValueError):
+        return 0, None
+
+
+# ---------------------------------------------------------------------------- checks
+def check_all(env: dict[str, str]) -> list[tuple[str, str, str]]:
+    """(name, "ok"|"warn"|"fail", detail): every line is something the user can act on."""
+    rows: list[tuple[str, str, str]] = []
+    token = setting("ULTRON_API_TOKEN", env)
+    if not (BACKEND / ".env").is_file():
+        rows.append(("config", "fail", "backend/.env is missing (copy .env.example and set ULTRON_API_TOKEN)"))
+    elif len(token) < 16:
+        rows.append(("api token", "fail", "ULTRON_API_TOKEN is missing or too short in backend/.env"))
+    else:
+        rows.append(("api token", "ok", "set (not shown)"))
+    for name, path in (("backend venv", BACKEND / ".venv/bin/uvicorn"),
+                       ("desktop venv", ROOT / "desktop/app/.venv/bin/python"),
+                       ("voice venv", ROOT / "desktop/voice/.venv/bin/python")):  # fmt: skip
+        rows.append((name, "ok" if path.exists() else "fail", str(path.relative_to(ROOT)) if path.exists() else f"missing: {path.relative_to(ROOT)} (see README)"))
+    ollama = setting("ULTRON_OLLAMA_BASE_URL", env, "http://127.0.0.1:11434").rstrip("/")
+    code, data = call("GET", ollama, "/api/tags", env, timeout=2)
+    if code != 200:
+        rows.append(("ollama", "fail", f"not reachable at {ollama} (start it: ollama serve)"))
+    else:
+        have = {m.get("name", "") for m in (data or {}).get("models", [])}
+        want = setting("ULTRON_OLLAMA_MODEL", env, "qwen3:4b-instruct")
+        rows.append(("local model", "ok" if want in have else "fail", want if want in have else f"{want} not pulled (ollama pull {want})"))
+        emb = setting("ULTRON_EMBEDDING_MODEL", env, "nomic-embed-text")
+        ok = any(n.split(":")[0] == emb.split(":")[0] for n in have)
+        rows.append(("embeddings", "ok" if ok else "warn", emb if ok else f"{emb} not pulled; memory search is off until it is (ollama pull {emb})"))
+    cloud = bool(setting("ULTRON_CLOUD_API_KEY", env))
+    rows.append(("cloud model", "ok" if cloud else "warn", "configured" if cloud else "not configured: everything runs on the local model"))
+    url = backend_url(env)
+    code, _ = call("GET", url, "/health", env, timeout=2)
+    rows.append(("backend", "ok" if code == 200 else "warn", f"running at {url}" if code == 200 else f"not running at {url} (ultron start)"))
+    cert = tls_cert(env)
+    if cert:
+        rows.append(("phone TLS", "ok" if cert.is_file() else "fail", str(cert) if cert.is_file() else f"certificate {cert} not found"))
+    else:
+        rows.append(("phone TLS", "warn", "no certificate: the phone app needs one. Run:  ultron phone setup"))
+    db = Path(setting("ULTRON_DATABASE_URL", env, "").split("///", 1)[-1] or BACKEND / "data/ultron.db")
+    rows.append(("database", "ok" if db.exists() else "warn", f"{db} ({db.stat().st_size // 1024} KB)" if db.exists() else f"{db} will be created on first start"))
+    return rows
+
+
+def lan_ip() -> str | None:
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("192.0.2.1", 9))
+            ip = s.getsockname()[0]
+        return None if ip.startswith("127.") else ip
+    except OSError:
+        return None
+
+
+# ---------------------------------------------------------------------------- commands
+def cmd_doctor(_args, env) -> int:
+    worst = 0
+    marks = {"ok": "OK  ", "warn": "WARN", "fail": "FAIL"}
+    for name, state, detail in check_all(env):
+        print(f"[{marks[state]}] {name:<13} {detail}")
+        worst = max(worst, {"ok": 0, "warn": 1, "fail": 2}[state])
+    print("\n" + ("Everything needed is in place." if worst == 0 else "Fix the FAIL lines first; WARN lines are optional."))
+    return 1 if worst == 2 else 0
+
+
+def backend_pid() -> int | None:
+    try:
+        pid = int(PIDFILE.read_text())
+        os.kill(pid, 0)
+        return pid
+    except (OSError, ValueError):
+        return None
+
+
+def backend_command(host: str, port: int, tls: tuple[Path, Path] | None, lan: str | None):
+    """The command that runs the backend. With a phone certificate it is ONE process on two
+    addresses: local http, and https for the phone on ALL interfaces. Not on one fixed Wi-Fi address:
+    laptops change address between networks, and a listener tied to the old one made the QR code
+    point at an address nobody was listening on. `lan` is only used to tell the user where to connect."""
+    py = BACKEND / ".venv/bin/python"
+    if tls:
+        cmd = [str(py), "-m", "app.serve", "--http-host", host, "--http-port", str(port),
+               "--tls-host", "0.0.0.0", "--tls-port", "8443",
+               "--tls-cert", str(tls[0]), "--tls-key", str(tls[1])]  # fmt: skip
+        return cmd, lan or "all interfaces"
+    uvicorn = BACKEND / ".venv/bin/uvicorn"
+    return [str(uvicorn), "app.main:app_factory", "--factory", "--host", host, "--port", str(port)], None
+
+
+def cmd_start(args, env) -> int:
+    url = backend_url(env)
+    code, _ = call("GET", url, "/health", env, timeout=2)
+    if code == 200:
+        print(f"backend already running at {url}")
+    else:
+        if not (BACKEND / ".venv/bin/uvicorn").exists():
+            print("backend venv missing: see README (Run it)", file=sys.stderr)
+            return 1
+        STATE.mkdir(parents=True, exist_ok=True)
+        auto_backup(env)  # a new version may migrate the database on its first start
+        host, port = args.host, args.port
+        cmd, https = backend_command(host, port, tls_files() if not args.no_phone else None, lan_ip())
+        with open(LOGFILE, "ab") as log:
+            proc = subprocess.Popen(cmd, cwd=BACKEND, stdout=log, stderr=log, start_new_session=True)
+        PIDFILE.write_text(str(proc.pid))
+        probe = f"http://{'127.0.0.1' if host in ('0.0.0.0', '') else host}:{port}"
+        if https:
+            print(f"phone listener: port 8443 on all network interfaces (this computer: {https}); certificate pinned by the phone")
+        for _ in range(60):
+            if call("GET", probe, "/health", env, timeout=1)[0] == 200:
+                print(f"backend started (pid {proc.pid}) at {probe}; log: {LOGFILE}")
+                break
+            time.sleep(0.25)
+        else:
+            print(f"backend did not come up; see {LOGFILE}", file=sys.stderr)
+            return 1
+    if args.no_window:
+        return 0
+    py = ROOT / "desktop/app/.venv/bin/python"
+    os.execv(str(py), [str(py), "-m", "ultron_desktop"]) if py.exists() else sys.exit("desktop venv missing")
+    return 0
+
+
+def cmd_stop(_args, _env) -> int:
+    pid = backend_pid()
+    if pid is None:
+        print("no backend started by `ultron start` is running")
+        return 0
+    os.kill(pid, signal.SIGTERM)
+    PIDFILE.unlink(missing_ok=True)
+    print(f"stopped backend (pid {pid})")
+    return 0
+
+
+def cmd_status(_args, env) -> int:
+    url = backend_url(env)
+    code, _ = call("GET", url, "/health", env, timeout=2)
+    print(f"backend: {'running' if code == 200 else 'not running'} ({url})" + (f", started by ultron (pid {backend_pid()})" if backend_pid() else ""))
+    token = setting("ULTRON_API_TOKEN", env)
+    if code == 200 and token:
+        c, devices = call("GET", url, "/v1/devices", env, token=token)
+        if c == 200:
+            live = [d for d in devices or [] if not d.get("revoked")]
+            print(f"phones: {len(live)} paired, {sum(1 for d in live if d.get('connected'))} connected")
+    return 0
+
+
+def ascii_qr(text: str) -> str | None:
+    py = ROOT / "desktop/app/.venv/bin/python"
+    if not py.exists():
+        return None
+    r = subprocess.run([str(py), "-c", "import sys,segno;segno.make(sys.argv[1],error='m').terminal(compact=True)", text],
+                       capture_output=True, text=True)  # fmt: skip
+    return r.stdout if r.returncode == 0 else None
+
+
+def cmd_pair(args, env) -> int:
+    from urllib.parse import urlencode  # noqa: PLC0415
+
+    token = setting("ULTRON_API_TOKEN", env)
+    if not token:
+        print("ULTRON_API_TOKEN is not set (backend/.env)", file=sys.stderr)
+        return 1
+    url = args.url or backend_url(env)
+    caps = args.powers.split(",")
+    code, data = call("POST", url, "/v1/devices/pairing-code", env, {"capabilities": caps}, token)
+    if code != 200 or not data:
+        print(f"could not get a pairing code (HTTP {code or 'no connection'}); is the backend running? try `ultron doctor`", file=sys.stderr)
+        return 1
+    fp = data.get("tls_fingerprint_sha256")
+    phone = args.phone_url or setting("ULTRON_PHONE_URL", env) or (f"https://{lan_ip()}:8443" if lan_ip() else "https://<this computer>:8443")
+    print(f"Pairing code : {data['code']}   (works once, expires in 5 minutes)")
+    print(f"Server address: {phone}")
+    if not fp:
+        print("\nWARNING: the backend is not served over TLS, so the phone app will refuse to pair.\n"
+              "Run desktop/packaging/make_lan_cert.sh, set ULTRON_TLS_CERT_FILE, and `ultron start --host <wifi-ip> --port 8443`.")  # fmt: skip
+        return 0
+    print(f"Fingerprint   : {fp}")
+    link = "ultron://pair?" + urlencode({"u": phone, "c": data["code"], "f": fp})
+    qr = ascii_qr(link)
+    if qr:
+        print("\nScan this in the ULTRON app (Pair > Scan):\n" + qr)
+    return 0
+
+
+def database_path(env: dict[str, str]) -> Path:
+    return Path(setting("ULTRON_DATABASE_URL", env, "").split("///", 1)[-1] or BACKEND / "data/ultron.db")
+
+
+def auto_backup(env: dict[str, str]) -> Path | None:
+    """At most one backup a day, taken before the backend starts; the newest 14 are kept."""
+    db = database_path(env)
+    dest_dir = BACKEND / "data/backups"
+    if not db.is_file() or any(dest_dir.glob(f"ultron-{datetime.now():%Y%m%d}-*.db")):
+        return None
+    made = make_backup(db, dest_dir)
+    for old in sorted(dest_dir.glob("ultron-*.db"))[:-14]:
+        old.unlink(missing_ok=True)
+    print(f"backup before start: {made}")
+    return made
+
+
+def make_backup(db: Path, dest_dir: Path) -> Path:
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    dest = dest_dir / f"ultron-{datetime.now():%Y%m%d-%H%M%S}.db"
+    src, dst = sqlite3.connect(db), sqlite3.connect(dest)
+    with dst:
+        src.backup(dst)  # a consistent copy even while the backend is running
+    src.close()
+    dst.close()
+    dest.chmod(0o600)
+    return dest
+
+
+def cmd_backup(_args, env) -> int:
+    db = database_path(env)
+    if not db.is_file():
+        print(f"no database at {db}")
+        return 1
+    dest = make_backup(db, BACKEND / "data/backups")
+    print(f"backup written: {dest} ({dest.stat().st_size // 1024} KB)")
+    return 0
+
+
+UNIT_TEXT = """[Unit]
+Description=ULTRON backend
+After=network-online.target
+
+[Service]
+WorkingDirectory={backend}
+ExecStart={backend}/.venv/bin/uvicorn app.main:app_factory --factory --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=default.target
+"""
+
+
+def cmd_service(args, _env) -> int:
+    if args.action == "remove":
+        subprocess.run(["systemctl", "--user", "disable", "--now", "ultron-backend"], check=False)
+        UNIT.unlink(missing_ok=True)
+        print("service removed")
+        return 0
+    print(f"This will write {UNIT} and enable it (user level, no sudo, starts at login).")
+    if not args.yes:
+        print("Run again with --yes to do it.")
+        return 0
+    UNIT.parent.mkdir(parents=True, exist_ok=True)
+    UNIT.write_text(UNIT_TEXT.format(backend=BACKEND))
+    subprocess.run(["systemctl", "--user", "daemon-reload"], check=False)
+    subprocess.run(["systemctl", "--user", "enable", "--now", "ultron-backend"], check=False)
+    print("service installed. Logs: journalctl --user -u ultron-backend -f   Undo: ultron service remove")
+    return 0
+
+
+ICON_SVG = """<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#38bdf8" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="#050b14"/>
+  <circle cx="128" cy="128" r="118" fill="url(#g)"/>
+  <circle cx="128" cy="128" r="84" fill="none" stroke="#38bdf8" stroke-width="7" stroke-dasharray="330 200" stroke-linecap="round"/>
+  <circle cx="128" cy="128" r="60" fill="none" stroke="#7dd3fc" stroke-width="4" stroke-dasharray="120 260" stroke-linecap="round" transform="rotate(120 128 128)"/>
+  <circle cx="128" cy="128" r="26" fill="#bae6fd"/>
+</svg>
+"""
+
+
+def desktop_entry(root: Path = ROOT) -> str:
+    """A menu entry that starts the backend if needed and opens the window (no terminal)."""
+    exe = str(root / "bin" / "ultron")
+    quoted = '"' + exe.replace("\\", "\\\\").replace('"', '\\"') + '"'
+    return (
+        "[Desktop Entry]\nType=Application\nName=ULTRON\nGenericName=Personal AI\n"
+        "Comment=Voice-first personal assistant\n"
+        f"Exec={quoted} start\nIcon=ultron\nTerminal=false\nCategories=Utility;\n"
+        "Keywords=assistant;voice;ai;\nStartupWMClass=ultron\nStartupNotify=true\n"
+        f"Actions=stop;\n\n[Desktop Action stop]\nName=Stop the ULTRON backend\nExec={quoted} stop\n"
+    )
+
+
+def cmd_launcher(args, _env) -> int:
+    if args.action == "remove":
+        for f in (DESKTOP_FILE, ICON_FILE):
+            f.unlink(missing_ok=True)
+        print(f"removed {DESKTOP_FILE} and {ICON_FILE}")
+        return 0
+    if not (ROOT / "desktop/app/.venv/bin/python").exists():
+        print("the desktop venv is missing (see README); not installing a launcher that cannot start", file=sys.stderr)
+        return 1
+    DESKTOP_FILE.parent.mkdir(parents=True, exist_ok=True)
+    ICON_FILE.parent.mkdir(parents=True, exist_ok=True)
+    ICON_FILE.write_text(ICON_SVG)
+    DESKTOP_FILE.write_text(desktop_entry())
+    DESKTOP_FILE.chmod(0o755)
+    for tool in (["update-desktop-database", str(DESKTOP_FILE.parent)],
+                 ["gtk-update-icon-cache", "-f", "-t", str(DATA / "icons/hicolor")]):  # fmt: skip
+        if shutil.which(tool[0]):
+            subprocess.run(tool, check=False, capture_output=True)
+    print(f"installed: {DESKTOP_FILE}\n           {ICON_FILE}\nFind ULTRON in your applications menu. Undo: ultron launcher remove")
+    return 0
+
+
+def cmd_phone(args, _env) -> int:
+    """One-time setup for the phone: a self-signed certificate for this computer's Wi-Fi address."""
+    lan = lan_ip()
+    if not lan:
+        print("Could not find this computer's Wi-Fi address. Connect to your home network first.", file=sys.stderr)
+        return 1
+    cert, key = TLS_DIR / "cert.pem", TLS_DIR / "key.pem"
+    if tls_files() and not args.renew:
+        print(f"A certificate already exists: {cert}")
+    else:
+        if shutil.which("openssl") is None:
+            print("openssl is needed to make the certificate (install it with your package manager)", file=sys.stderr)
+            return 1
+        TLS_DIR.mkdir(parents=True, exist_ok=True)
+        TLS_DIR.chmod(0o700)
+        old_umask = os.umask(0o077)
+        try:
+            names = f"IP:{lan},IP:127.0.0.1,DNS:{socket.gethostname()}"
+            subprocess.run(
+                ["openssl", "req", "-x509", "-newkey", "rsa:3072", "-sha256", "-days", "730", "-nodes",
+                 "-keyout", str(key), "-out", str(cert), "-subj", "/CN=ULTRON", "-addext", f"subjectAltName={names}"],
+                check=True, capture_output=True,
+            )  # fmt: skip
+        finally:
+            os.umask(old_umask)
+        key.chmod(0o600)
+        cert.chmod(0o644)
+        print(f"Certificate made: {cert}  (the private key is readable only by you)")
+    fp = subprocess.run(["openssl", "x509", "-in", str(cert), "-noout", "-fingerprint", "-sha256"],
+                        capture_output=True, text=True).stdout.strip().split("=", 1)[-1]  # fmt: skip
+    subnet = ".".join(lan.split(".")[:3]) + ".0/24"
+    print(f"Fingerprint: {fp}\n")
+    print("Next:")
+    print("  1. Allow the phone through this computer's firewall (needs your sudo password; home network only):")
+    print(f"       sudo ufw allow from {subnet} to any port 8443 proto tcp")
+    print("  2. Restart ULTRON so it listens for the phone:   ultron stop && ultron start")
+    print("  3. In the window choose Phone, create a pairing code, and scan the QR code with the app.")
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog="ultron", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("doctor")
+    st = sub.add_parser("start")
+    st.add_argument("--host", default="127.0.0.1")
+    st.add_argument("--port", type=int, default=8000)
+    st.add_argument("--tls", action="store_true", help="serve with ULTRON_TLS_CERT_FILE (needed for the phone over Wi-Fi)")
+    st.add_argument("--no-window", action="store_true")
+    st.add_argument("--no-phone", action="store_true", help="do not open the Wi-Fi listener for the phone")
+    sub.add_parser("stop")
+    sub.add_parser("status")
+    pr = sub.add_parser("pair")
+    pr.add_argument("--url", help="backend address (default: ULTRON_BACKEND_URL or http://127.0.0.1:8000)")
+    pr.add_argument("--phone-url", help="address the phone should use")
+    pr.add_argument("--powers", default="chat,notify,reminders", help="comma list: chat,notify,call,reminders")
+    sub.add_parser("backup")
+    ph = sub.add_parser("phone")
+    ph.add_argument("action", choices=["setup"])
+    ph.add_argument("--renew", action="store_true", help="make a new certificate (the phone must pair again)")
+    ln = sub.add_parser("launcher")
+    ln.add_argument("action", choices=["install", "remove"])
+    sv = sub.add_parser("service")
+    sv.add_argument("action", choices=["install", "remove"])
+    sv.add_argument("--yes", action="store_true")
+    args = ap.parse_args(argv)
+    env = read_env()
+    return {"doctor": cmd_doctor, "start": cmd_start, "stop": cmd_stop, "status": cmd_status,
+            "pair": cmd_pair, "backup": cmd_backup, "service": cmd_service,
+            "launcher": cmd_launcher, "phone": cmd_phone}[args.cmd](args, env)  # fmt: skip
+
+
+if __name__ == "__main__":
+    sys.exit(main())

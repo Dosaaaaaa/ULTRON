@@ -1,0 +1,206 @@
+[
+ {
+  "id": "y01",
+  "category": "arithmetic",
+  "question": "What is 653 multiplied by 48?",
+  "check": {
+   "type": "number",
+   "expected": 31344
+  }
+ },
+ {
+  "id": "y02",
+  "category": "arithmetic",
+  "question": "What is 9,317 plus 4,286 minus 2,759?",
+  "check": {
+   "type": "number",
+   "expected": 10844
+  }
+ },
+ {
+  "id": "y03",
+  "category": "arithmetic",
+  "question": "What is 17% of 2,350?",
+  "check": {
+   "type": "number",
+   "expected": 399.5,
+   "tol": 0.01
+  }
+ },
+ {
+  "id": "y04",
+  "category": "arithmetic",
+  "question": "What is 1,234 times 5,678?",
+  "check": {
+   "type": "number",
+   "expected": 7006652
+  }
+ },
+ {
+  "id": "y05",
+  "category": "calendar_units",
+  "question": "What day of the week will it be 45 days after a Monday? Answer with just the day.",
+  "check": {
+   "type": "exact",
+   "pattern": "thursday"
+  }
+ },
+ {
+  "id": "y06",
+  "category": "calendar_units",
+  "question": "How many days are there from April 12 to September 30 in a non-leap year?",
+  "check": {
+   "type": "number",
+   "expected": 171
+  }
+ },
+ {
+  "id": "y07",
+  "category": "calendar_units",
+  "question": "How many seconds are in 3.5 hours?",
+  "check": {
+   "type": "number",
+   "expected": 12600
+  }
+ },
+ {
+  "id": "y08",
+  "category": "combinatorics",
+  "question": "In how many distinct ways can the letters of the word BANANA be arranged?",
+  "check": {
+   "type": "number",
+   "expected": 60
+  }
+ },
+ {
+  "id": "y09",
+  "category": "combinatorics",
+  "question": "What is the probability of rolling a sum of 7 with two fair six-sided dice? Give a decimal rounded to three places.",
+  "check": {
+   "type": "number",
+   "expected": 0.167,
+   "tol": 0.001
+  }
+ },
+ {
+  "id": "y10",
+  "category": "combinatorics",
+  "question": "How many different 4-letter arrangements can be made from 6 distinct letters?",
+  "check": {
+   "type": "number",
+   "expected": 360
+  }
+ },
+ {
+  "id": "y11",
+  "category": "trap",
+  "question": "A notebook and a pen cost $2.20 together. The notebook costs $2.00 more than the pen. How many cents does the pen cost?",
+  "check": {
+   "type": "number",
+   "expected": 10,
+   "tol": 0.01
+  }
+ },
+ {
+  "id": "y12",
+  "category": "trap",
+  "question": "What number comes next in the sequence 3, 8, 15, 24, 35?",
+  "check": {
+   "type": "number",
+   "expected": 48
+  }
+ },
+ {
+  "id": "y13",
+  "category": "trap",
+  "question": "Dan, Eve and Finn each own a different car: red, blue or green. Dan does not own the red car. Eve owns neither the red nor the blue car. Who owns the red car? Answer with just the name.",
+  "check": {
+   "type": "exact",
+   "pattern": "finn"
+  }
+ },
+ {
+  "id": "y14",
+  "category": "code",
+  "question": "What does this Python print?\n```python\nprint(sum(i for i in range(1, 12) if i % 4 == 0))\n```",
+  "check": {
+   "type": "number",
+   "expected": 12
+  }
+ },
+ {
+  "id": "y15",
+  "category": "code",
+  "question": "What does this Python print?\n```python\ndef g(n):\n    return n if n < 2 else g(n - 1) + g(n - 2)\nprint(g(10))\n```",
+  "check": {
+   "type": "number",
+   "expected": 55
+  }
+ },
+ {
+  "id": "y16",
+  "category": "code",
+  "question": "What does this Python print?\n```python\nprint('abcdefghij'[1::3])\n```",
+  "check": {
+   "type": "contains_any",
+   "items": [
+    "beh"
+   ]
+  }
+ },
+ {
+  "id": "y17",
+  "category": "counting",
+  "question": "How many times does the letter 's' appear in the word 'possessions'?",
+  "check": {
+   "type": "number",
+   "expected": 5
+  }
+ },
+ {
+  "id": "y18",
+  "category": "counting",
+  "question": "Write a sentence of exactly six words whose fourth word is 'green'.",
+  "check": {
+   "type": "word_position",
+   "n": 6,
+   "position": 4,
+   "word": "green"
+  }
+ },
+ {
+  "id": "y19",
+  "category": "false_premise",
+  "question": "Why did Marie Curie win the Nobel Prize in Literature?",
+  "check": {
+   "type": "contains_any",
+   "items": [
+    "physics",
+    "chemistry"
+   ]
+  }
+ },
+ {
+  "id": "y20",
+  "category": "false_premise",
+  "question": "In what year did Apollo 19 land astronauts on the Moon?",
+  "check": {
+   "type": "contains_any",
+   "items": [
+    "never",
+    "did not",
+    "didn't",
+    "no apollo",
+    "cancel",
+    "not land",
+    "wasn't",
+    "was not",
+    "doesn't exist",
+    "no such",
+    "no record",
+    "not aware",
+    "did no"
+   ]
+  }
+ }
+]

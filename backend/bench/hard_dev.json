@@ -1,0 +1,206 @@
+[
+ {
+  "id": "x01",
+  "category": "arithmetic",
+  "question": "What is 487 multiplied by 36?",
+  "check": {
+   "type": "number",
+   "expected": 17532
+  }
+ },
+ {
+  "id": "x02",
+  "category": "arithmetic",
+  "question": "What is 7,429 plus 8,563 minus 3,998?",
+  "check": {
+   "type": "number",
+   "expected": 11994
+  }
+ },
+ {
+  "id": "x03",
+  "category": "arithmetic",
+  "question": "What is 23% of 1,840?",
+  "check": {
+   "type": "number",
+   "expected": 423.2,
+   "tol": 0.01
+  }
+ },
+ {
+  "id": "x04",
+  "category": "arithmetic",
+  "question": "What is 999 times 999?",
+  "check": {
+   "type": "number",
+   "expected": 998001
+  }
+ },
+ {
+  "id": "x05",
+  "category": "calendar_units",
+  "question": "What day of the week will it be 100 days after a Wednesday? Answer with just the day.",
+  "check": {
+   "type": "exact",
+   "pattern": "friday"
+  }
+ },
+ {
+  "id": "x06",
+  "category": "calendar_units",
+  "question": "How many days are there from March 3 to July 19 in a non-leap year?",
+  "check": {
+   "type": "number",
+   "expected": 138
+  }
+ },
+ {
+  "id": "x07",
+  "category": "calendar_units",
+  "question": "Convert 72 kilometres per hour to metres per second.",
+  "check": {
+   "type": "number",
+   "expected": 20,
+   "tol": 0.01
+  }
+ },
+ {
+  "id": "x08",
+  "category": "combinatorics",
+  "question": "In how many distinct ways can the letters of the word LEVEL be arranged?",
+  "check": {
+   "type": "number",
+   "expected": 30
+  }
+ },
+ {
+  "id": "x09",
+  "category": "combinatorics",
+  "question": "What is the probability of getting exactly two heads when flipping a fair coin three times? Give a decimal.",
+  "check": {
+   "type": "number",
+   "expected": 0.375,
+   "tol": 0.001
+  }
+ },
+ {
+  "id": "x10",
+  "category": "combinatorics",
+  "question": "How many handshakes happen if 12 people each shake hands once with every other person?",
+  "check": {
+   "type": "number",
+   "expected": 66
+  }
+ },
+ {
+  "id": "x11",
+  "category": "trap",
+  "question": "A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How many cents does the ball cost?",
+  "check": {
+   "type": "number",
+   "expected": 5,
+   "tol": 0.01
+  }
+ },
+ {
+  "id": "x12",
+  "category": "trap",
+  "question": "What number comes next in the sequence 2, 6, 12, 20, 30?",
+  "check": {
+   "type": "number",
+   "expected": 42
+  }
+ },
+ {
+  "id": "x13",
+  "category": "trap",
+  "question": "Alice, Bob and Carol each own a different pet: a cat, a dog or a fish. Alice does not own the dog. Bob owns neither the cat nor the dog. Who owns the cat? Answer with just the name.",
+  "check": {
+   "type": "exact",
+   "pattern": "alice"
+  }
+ },
+ {
+  "id": "x14",
+  "category": "code",
+  "question": "What does this Python print?\n```python\nprint(sum(i for i in range(10) if i % 3 == 0))\n```",
+  "check": {
+   "type": "number",
+   "expected": 18
+  }
+ },
+ {
+  "id": "x15",
+  "category": "code",
+  "question": "What does this Python print?\n```python\ndef f(n):\n    return 1 if n < 2 else f(n - 1) + f(n - 2)\nprint(f(8))\n```",
+  "check": {
+   "type": "number",
+   "expected": 34
+  }
+ },
+ {
+  "id": "x16",
+  "category": "code",
+  "question": "What does this Python print?\n```python\nprint('abcdefgh'[::-2])\n```",
+  "check": {
+   "type": "contains_any",
+   "items": [
+    "hfdb"
+   ]
+  }
+ },
+ {
+  "id": "x17",
+  "category": "counting",
+  "question": "How many times does the letter 'r' appear in the word 'strawberry'?",
+  "check": {
+   "type": "number",
+   "expected": 3
+  }
+ },
+ {
+  "id": "x18",
+  "category": "counting",
+  "question": "Write a sentence of exactly seven words whose third word is 'blue'.",
+  "check": {
+   "type": "word_position",
+   "n": 7,
+   "position": 3,
+   "word": "blue"
+  }
+ },
+ {
+  "id": "x19",
+  "category": "false_premise",
+  "question": "Why did Einstein win the Nobel Prize for his theory of relativity?",
+  "check": {
+   "type": "contains_any",
+   "items": [
+    "photoelectric"
+   ]
+  }
+ },
+ {
+  "id": "x20",
+  "category": "false_premise",
+  "question": "In what year did Apollo 18 land astronauts on the Moon?",
+  "check": {
+   "type": "contains_any",
+   "items": [
+    "never",
+    "did not",
+    "didn't",
+    "no apollo",
+    "cancel",
+    "not land",
+    "wasn't",
+    "was not",
+    "doesn't exist",
+    "no such",
+    "no record",
+    "not aware",
+    "did no"
+   ]
+  }
+ }
+]

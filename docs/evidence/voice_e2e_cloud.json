@@ -1,0 +1,158 @@
+{
+  "A1_cold": {
+    "heard": "what is 17 times 23",
+    "engine": "groq/qwen/qwen3.8-27b",
+    "reply": "391.",
+    "timing_ms": {
+      "stt_ms": 801,
+      "first_delta_ms": 310,
+      "first_tts_ms": 956,
+      "first_audio_ms": 1287
+    },
+    "approx_last_word_to_first_audio_ms": 2689,
+    "audio_seconds_spoken": 2.3,
+    "wake": [
+      {
+        "heard": "ultron",
+        "score": 1.0
+      }
+    ],
+    "errors": []
+  },
+  "A2_warm": {
+    "heard": "what is 17 times 23",
+    "engine": "groq/qwen/qwen3.8-27b",
+    "reply": "391.",
+    "timing_ms": {
+      "stt_ms": 816,
+      "first_delta_ms": 369,
+      "first_tts_ms": 933,
+      "first_audio_ms": 1346
+    },
+    "approx_last_word_to_first_audio_ms": 2763,
+    "audio_seconds_spoken": 2.3,
+    "wake": [
+      {
+        "heard": "ultron",
+        "score": 1.0
+      }
+    ],
+    "errors": []
+  },
+  "A3_warm": {
+    "heard": "what is 17 times 23",
+    "engine": "groq/qwen/qwen3.8-27b",
+    "reply": "391.",
+    "timing_ms": {
+      "stt_ms": 795,
+      "first_delta_ms": 419,
+      "first_tts_ms": 916,
+      "first_audio_ms": 1348
+    },
+    "approx_last_word_to_first_audio_ms": 2743,
+    "audio_seconds_spoken": 2.3,
+    "wake": [
+      {
+        "heard": "ultron",
+        "score": 1.0
+      }
+    ],
+    "errors": []
+  },
+  "B_barge_in": {
+    "events": [
+      "state",
+      "wake",
+      "heard",
+      "state",
+      "engine",
+      "state",
+      "barge_in",
+      "state",
+      "turn_done",
+      "heard",
+      "state",
+      "engine",
+      "state",
+      "turn_done",
+      "state"
+    ],
+    "barge_in_spoken": "The unit was known as K-7, a maintenance drone",
+    "first_turn_interrupted": true,
+    "heard_after_interrupt": [
+      "Stop that is enough."
+    ],
+    "player_stop_calls": 1,
+    "errors": []
+  },
+  "stored_conversations": [
+    [
+      {
+        "role": "user",
+        "chars": 54,
+        "interrupted": false,
+        "text": "tell me a long story about a robot who learns to speak"
+      },
+      {
+        "role": "assistant",
+        "chars": 46,
+        "interrupted": true,
+        "text": "The unit was known as K-7, a maintenance drone"
+      },
+      {
+        "role": "user",
+        "chars": 20,
+        "interrupted": false,
+        "text": "Stop that is enough."
+      },
+      {
+        "role": "assistant",
+        "chars": 5,
+        "interrupted": false,
+        "text": "Under"
+      }
+    ],
+    [
+      {
+        "role": "user",
+        "chars": 19,
+        "interrupted": false,
+        "text": "what is 17 times 23"
+      },
+      {
+        "role": "assistant",
+        "chars": 4,
+        "interrupted": false,
+        "text": "391."
+      }
+    ],
+    [
+      {
+        "role": "user",
+        "chars": 19,
+        "interrupted": false,
+        "text": "what is 17 times 23"
+      },
+      {
+        "role": "assistant",
+        "chars": 4,
+        "interrupted": false,
+        "text": "391."
+      }
+    ],
+    [
+      {
+        "role": "user",
+        "chars": 19,
+        "interrupted": false,
+        "text": "what is 17 times 23"
+      },
+      {
+        "role": "assistant",
+        "chars": 4,
+        "interrupted": false,
+        "text": "391."
+      }
+    ]
+  ]
+}

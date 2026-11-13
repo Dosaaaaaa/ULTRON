@@ -1,0 +1,202 @@
+[
+  {
+    "name": "dragon_story#1",
+    "prompt": "Tell me a bedtime story about a dragon.",
+    "reply": "A dragon slept beneath a mountain, dreaming of wings it had never grown. One night, a small bird landed on its nose. The dragon stayed still, afraid to wake, and the bird sang a lullaby that lasted until dawn. The mountain was quiet, and the dream was safe.",
+    "engine": {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "tier": "cloud"
+    },
+    "latency_ms": 421,
+    "tokens": [
+      1262,
+      60
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 48
+    }
+  },
+  {
+    "name": "laugh#1",
+    "prompt": "Say something funny.",
+    "reply": "My therapist told me to stop being so cold. I told her I was already a frozen server. She said that was not a personality trait.",
+    "engine": {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "tier": "cloud"
+    },
+    "latency_ms": 385,
+    "tokens": [
+      1257,
+      30
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 26
+    }
+  },
+  {
+    "name": "movie#1",
+    "prompt": "Recommend a film for tonight.",
+    "reply": "The Zone of Interest is a precise, unsettling study of banality in horror. It strips away spectacle to reveal how ordinary people maintain normalcy while participating in atrocity. It is a demanding watch, but it leaves a mark.",
+    "engine": {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "tier": "cloud"
+    },
+    "latency_ms": 1190,
+    "tokens": [
+      1259,
+      47
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 38
+    }
+  },
+  {
+    "name": "dog_name#1",
+    "prompt": "Suggest a name for my new dog.",
+    "reply": "Choose a short, two-syllable name like \"Rex\" or \"Luna\" for clarity. Dogs respond best to distinct, high-pitched sounds that cut through background noise.",
+    "engine": {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "tier": "cloud"
+    },
+    "latency_ms": 878,
+    "tokens": [
+      1262,
+      39
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 23
+    }
+  },
+  {
+    "name": "hamlet#1",
+    "prompt": "Summarise the plot of Hamlet.",
+    "reply": "Hamlet, Prince of Denmark, discovers that his uncle Claudius murdered his father and seized the throne. Driven by grief and a desire for revenge, Hamlet feigns madness to investigate the truth, leading to a series of tragic events including the deaths of Ophelia, Polonius, and Laertes. In the final act, Hamlet kills Claudius but is fatally poisoned himself, dying with a warning to the living.",
+    "engine": {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "tier": "cloud"
+    },
+    "latency_ms": 461,
+    "tokens": [
+      1262,
+      90
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 65
+    }
+  },
+  {
+    "name": "haiku#1",
+    "prompt": "Write a haiku about winter.",
+    "reply": "Snow falls in silence\nThe world below turns to white\nCold breath hangs in air",
+    "engine": {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "tier": "cloud"
+    },
+    "latency_ms": 304,
+    "tokens": [
+      1260,
+      18
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 15
+    }
+  },
+  {
+    "name": "analogy#1",
+    "prompt": "Explain inflation with an analogy.",
+    "reply": "Imagine a fixed amount of gold in a room. If the number of people in the room doubles, the value of that gold per person is cut in half. Inflation is the same mechanism, but applied to money: when the supply of currency grows faster than the goods and services available, the purchasing power of each unit falls.",
+    "engine": {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "tier": "cloud"
+    },
+    "latency_ms": 466,
+    "tokens": [
+      1260,
+      67
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 58
+    }
+  },
+  {
+    "name": "riddle#1",
+    "prompt": "Give me a riddle.",
+    "reply": "What has a heart that does not beat?\n\nThe answer is an artichoke.",
+    "engine": {
+      "provider": "groq",
+      "model": "qwen/qwen3.8-27b",
+      "tier": "cloud"
+    },
+    "latency_ms": 318,
+    "tokens": [
+      1259,
+      19
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 13
+    }
+  }
+]

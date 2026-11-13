@@ -1,0 +1,155 @@
+{
+  "A1_cold": {
+    "heard": "what is 17 times 23",
+    "reply": "17 times 23 is 391.",
+    "timing_ms": {
+      "stt_ms": 793,
+      "first_delta_ms": 2137,
+      "first_tts_ms": 1705,
+      "first_audio_ms": 4352
+    },
+    "approx_last_word_to_first_audio_ms": 5745,
+    "audio_seconds_spoken": 4.39,
+    "wake": [
+      {
+        "heard": "ultron",
+        "score": 1.0
+      }
+    ],
+    "errors": []
+  },
+  "A2_warm": {
+    "heard": "what is 17 times 23",
+    "reply": "17 times 23 is 391.",
+    "timing_ms": {
+      "stt_ms": 788,
+      "first_delta_ms": 352,
+      "first_tts_ms": 1723,
+      "first_audio_ms": 2586
+    },
+    "approx_last_word_to_first_audio_ms": 3974,
+    "audio_seconds_spoken": 4.39,
+    "wake": [
+      {
+        "heard": "ultron",
+        "score": 1.0
+      }
+    ],
+    "errors": []
+  },
+  "A3_warm": {
+    "heard": "what is 17 times 23",
+    "reply": "17 times 23 is 391.",
+    "timing_ms": {
+      "stt_ms": 792,
+      "first_delta_ms": 2079,
+      "first_tts_ms": 1673,
+      "first_audio_ms": 4249
+    },
+    "approx_last_word_to_first_audio_ms": 5641,
+    "audio_seconds_spoken": 4.39,
+    "wake": [
+      {
+        "heard": "ultron",
+        "score": 1.0
+      }
+    ],
+    "errors": []
+  },
+  "B_barge_in": {
+    "events": [
+      "state",
+      "wake",
+      "heard",
+      "state",
+      "engine",
+      "state",
+      "barge_in",
+      "state",
+      "turn_done",
+      "heard",
+      "state",
+      "engine",
+      "state",
+      "turn_done",
+      "state"
+    ],
+    "barge_in_spoken": "A robot named Kael was built to perform tasks, not to",
+    "first_turn_interrupted": true,
+    "heard_after_interrupt": [
+      "Stop that is enough."
+    ],
+    "player_stop_calls": 1,
+    "errors": []
+  },
+  "stored_conversations": [
+    [
+      {
+        "role": "user",
+        "chars": 54,
+        "interrupted": false,
+        "text": "tell me a long story about a robot who learns to speak"
+      },
+      {
+        "role": "assistant",
+        "chars": 53,
+        "interrupted": true,
+        "text": "A robot named Kael was built to perform tasks, not to"
+      },
+      {
+        "role": "user",
+        "chars": 20,
+        "interrupted": false,
+        "text": "Stop that is enough."
+      },
+      {
+        "role": "assistant",
+        "chars": 11,
+        "interrupted": false,
+        "text": "Understood."
+      }
+    ],
+    [
+      {
+        "role": "user",
+        "chars": 19,
+        "interrupted": false,
+        "text": "what is 17 times 23"
+      },
+      {
+        "role": "assistant",
+        "chars": 19,
+        "interrupted": false,
+        "text": "17 times 23 is 391."
+      }
+    ],
+    [
+      {
+        "role": "user",
+        "chars": 19,
+        "interrupted": false,
+        "text": "what is 17 times 23"
+      },
+      {
+        "role": "assistant",
+        "chars": 19,
+        "interrupted": false,
+        "text": "17 times 23 is 391."
+      }
+    ],
+    [
+      {
+        "role": "user",
+        "chars": 19,
+        "interrupted": false,
+        "text": "what is 17 times 23"
+      },
+      {
+        "role": "assistant",
+        "chars": 19,
+        "interrupted": false,
+        "text": "17 times 23 is 391."
+      }
+    ]
+  ]
+}

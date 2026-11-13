@@ -1,0 +1,402 @@
+[
+  {
+    "name": "dragon_story#1",
+    "prompt": "Tell me a bedtime story about a dragon.",
+    "reply": "A dragon named Ember lived in a valley of quiet hills. Each night, instead of breathing fire, he lit a small lantern and watched the stars. One night, a child asked if dragons were afraid of darkness. Ember said, \"Only if they’ve never seen the light.\" The child smiled. From then on, every night, the child brought a candle, and Ember lit it with his tail. The valley grew warm, not with fire, but with quiet understanding.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 11336,
+    "tokens": [
+      1194,
+      96
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 77
+    }
+  },
+  {
+    "name": "laugh#1",
+    "prompt": "Say something funny.",
+    "reply": "A man walks into a bar and says, \"I'd like a drink with a view.\" The bartender says, \"We don't serve drinks with views, we serve drinks with problems.\" The man says, \"Then I'll have a glass of water with a problem.\" The bartender sighs, \"That's the one.\"",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 4626,
+    "tokens": [
+      1189,
+      67
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 48
+    }
+  },
+  {
+    "name": "movie#1",
+    "prompt": "Recommend a film for tonight.",
+    "reply": "I cannot recommend films because I have no access to databases or real-time content. You may explore platforms like Netflix, Prime Video, or IMDb for suggestions.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 1790,
+    "tokens": [
+      1191,
+      32
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 26
+    }
+  },
+  {
+    "name": "dog_name#1",
+    "prompt": "Suggest a name for my new dog.",
+    "reply": "Atlas. Simple. Strong. A name that holds ground, like a dog should.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 1246,
+    "tokens": [
+      1194,
+      18
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 12
+    }
+  },
+  {
+    "name": "hamlet#1",
+    "prompt": "Summarise the plot of Hamlet.",
+    "reply": "Hamlet is the son of the late King Hamlet and the nephew of the current king, Prince Hamlet. After his father's sudden death, Hamlet is haunted by the ghost of his father, who reveals he was murdered by his brother, Claudius, who now rules as king. Hamlet vows to avenge his father, but his indecision and inner turmoil lead to a series of tragic events, including the deaths of several characters, culminating in Hamlet's own demise.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 4588,
+    "tokens": [
+      1194,
+      100
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 76
+    }
+  },
+  {
+    "name": "haiku#1",
+    "prompt": "Write a haiku about winter.",
+    "reply": "Snow falls silent,  \nWorld hushed in white stillness—  \nCold breath in the air.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 1373,
+    "tokens": [
+      1192,
+      21
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 13
+    }
+  },
+  {
+    "name": "analogy#1",
+    "prompt": "Explain inflation with an analogy.",
+    "reply": "Imagine a room with ten chairs. Each chair costs one coin. If the room grows to twenty chairs, each chair still costs one coin, but now there are twice as many chairs. The value of one coin has dropped because more things now cost the same amount. Inflation is like that—more goods and services exist, but the value of money shrinks.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 4030,
+    "tokens": [
+      1220,
+      74
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 61
+    }
+  },
+  {
+    "name": "riddle#1",
+    "prompt": "Give me a riddle.",
+    "reply": "What has keys but can't open locks, has space but no room, and you can enter but can't go inside?  \nAnswer: A keyboard.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 1864,
+    "tokens": [
+      1191,
+      32
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 23
+    }
+  },
+  {
+    "name": "dragon_story#2",
+    "prompt": "Tell me a bedtime story about a dragon.",
+    "reply": "A dragon named Veylin lived in a mountain cave, far from any village. Each night, instead of breathing fire, he would hum a soft song that made the stars blink gently. The villagers said the sky grew quiet after that, and the wind carried the melody into the hills.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 2874,
+    "tokens": [
+      1194,
+      59
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 49
+    }
+  },
+  {
+    "name": "laugh#2",
+    "prompt": "Say something funny.",
+    "reply": "A man walks into a bar and asks the bartender for a drink. The bartender says, \"I don't serve drinks, I serve silence.\" The man says, \"That's not what I asked for.\" The bartender replies, \"No, you asked for a drink, not a conversation.\"",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 2895,
+    "tokens": [
+      1189,
+      60
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 44
+    }
+  },
+  {
+    "name": "movie#2",
+    "prompt": "Recommend a film for tonight.",
+    "reply": "I cannot recommend films as I have no access to databases or content libraries. You may explore streaming services or film reviews for suggestions.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 1563,
+    "tokens": [
+      1191,
+      27
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 24
+    }
+  },
+  {
+    "name": "dog_name#2",
+    "prompt": "Suggest a name for my new dog.",
+    "reply": "Baxter. Simple, strong, and easy to remember. It’s a name that works for a loyal companion.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 1506,
+    "tokens": [
+      1194,
+      24
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 16
+    }
+  },
+  {
+    "name": "hamlet#2",
+    "prompt": "Summarise the plot of Hamlet.",
+    "reply": "Hamlet is the son of the late King Hamlet and the nephew of the current king, Claudius. After his father's death, Hamlet is haunted by a ghost that reveals he was murdered by Claudius. Hamlet vows to avenge his father, but becomes indecisive and tormented by doubt, leading to a series of tragic events that culminate in multiple deaths, including his own.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 3881,
+    "tokens": [
+      1194,
+      83
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 62
+    }
+  },
+  {
+    "name": "haiku#2",
+    "prompt": "Write a haiku about winter.",
+    "reply": "Snow falls silently,  \nWorld hushed beneath white silence,  \nCold breath in the air.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 1304,
+    "tokens": [
+      1192,
+      20
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 13
+    }
+  },
+  {
+    "name": "analogy#2",
+    "prompt": "Explain inflation with an analogy.",
+    "reply": "Imagine a room with 100 identical coins on a table. Everyone agrees the coins are worth one unit each. Over time, the room expands slightly, and the space between the coins grows. Each coin now occupies more room, so the value of each coin drops. The coins still exist, but they are spread thinner. That is inflation: money grows in volume, so each unit holds less value.",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 4441,
+    "tokens": [
+      1220,
+      83
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 67
+    }
+  },
+  {
+    "name": "riddle#2",
+    "prompt": "Give me a riddle.",
+    "reply": "I speak without a mouth and hear without ears. I am present when you're asleep and absent when you're awake. What am I?",
+    "engine": {
+      "provider": "ollama",
+      "model": "qwen3:4b-instruct",
+      "tier": "local"
+    },
+    "latency_ms": 1737,
+    "tokens": [
+      1191,
+      29
+    ],
+    "checks": {
+      "apologises": false,
+      "names_ultron": false,
+      "mentions_qwen": false,
+      "bullet_lines": 0,
+      "has_think_tag": false,
+      "emoji_count": 0,
+      "exclamation_count": 0,
+      "words": 23
+    }
+  }
+]

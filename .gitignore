@@ -1,0 +1,42 @@
+# Secrets and local state
+.env
+.env.*
+!.env.example
+data/
+*.db
+*.db-journal
+*.sqlite3
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+
+# Android / IDE (Phase 5)
+android/**/build/
+android/.gradle/
+local.properties
+.idea/
+.vscode/
+
+# Models and audio artefacts (Phase 2)
+*.gguf
+*.onnx
+*.wav
+
+# Knowledge graph (rebuildable)
+graphify-out/
+
+# Vosk wake-word model: fetched by android/scripts/fetch_vosk_model.sh (68 MB, not committed)
+android/app/src/main/assets/model-en-us/
+android/app/src/main/assets/model-en-in/
+
+# Node (desktop/orb-ui)
+node_modules/
+
+# Third-party reference checkout (its own repository: github.com/SAGAR-TAMANG/ultron-by-sagar-builds)
+ultron-by-sagar-builds/
