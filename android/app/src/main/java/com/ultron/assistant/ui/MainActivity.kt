@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -51,12 +52,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
-import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.ultron.assistant.BuildConfig
+import com.ultron.assistant.data.NoteStore
 import com.ultron.assistant.service.LinkStatus
 import com.ultron.assistant.service.HandsFreeService
+import com.ultron.assistant.service.NoteIngest
 import com.ultron.assistant.service.PushService
 
 class MainActivity : ComponentActivity() {
@@ -98,11 +98,11 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
     }
 
-    private fun scan() {
-        val options = GmsBarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
-        GmsBarcodeScanning.getClient(this, options).startScan()
-            .addOnSuccessListener { b -> b.rawValue?.let(vm::offerLink) }
-            .addOnFailureListener { vm.pairError = "Scanning did not work (${it.message ?: "cancelled"}). You can enter the details by hand." }
+    /** The pairing QR code holds an ultron://pair link; the phone's own Camera app reads it and offers to open it
+     *  here (see the intent filter in the manifest). No scanner library and no camera permission of ours. */
+    private fun openCamera() {
+        runCatching { startActivity(Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+            .onFailure { vm.pairError = "The Camera could not be opened. You can enter the details by hand." }
     }
 
     private fun has(permission: String) = ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
@@ -131,7 +131,7 @@ class MainActivity : ComponentActivity() {
                 onClose = { training = false; if (vm.store.handsFree) HandsFreeService.start(this@MainActivity) },
             )
         } else if (vm.showPair || vm.pendingLink != null) {
-            PairScreen(vm.pairBusy, vm.pairError, Build.MODEL ?: "Phone", onScan = ::scan, onManual = vm::pairManually, onBack = { vm.showPair = false })
+            PairScreen(vm.pairBusy, vm.pairError, Build.MODEL ?: "Phone", onOpenCamera = ::openCamera, onManual = vm::pairManually, onBack = { vm.showPair = false })
         } else {
             Main(pairing) // the app works without a computer; connecting is optional
         }
@@ -254,6 +254,25 @@ class MainActivity : ComponentActivity() {
         var soundOnWake by remember { mutableStateOf(vm.store.soundOnWake) }
         var musicApp by remember { mutableStateOf(vm.store.musicApp) }
         var onlineCommands by remember { mutableStateOf(vm.store.onlineCommands) }
+        var googleTalk by remember { mutableStateOf(vm.store.googleTalk) }
+        var ttsEngine by remember { mutableStateOf(vm.store.ttsEngine) }
+        var quickCommands by remember { mutableStateOf(vm.store.quickCommands) }
+        val noteStore = remember { NoteStore(this) }
+        var notesTick by remember { mutableIntStateOf(0) }
+        var noteSources by remember { mutableStateOf(vm.store.noteSources) }
+        var morning by remember { mutableStateOf(vm.store.morningSummary) }
+        val notesUi = remember(tick, notesTick, noteSources, morning) {
+            NotesUi(
+                access = NoteIngest.accessGranted(this), sources = noteSources, morning = morning,
+                kept = noteStore.all().size, dropped = noteStore.dropped,
+                onSource = { key, on -> noteSources = (if (on) noteSources + key else noteSources - key).also { vm.store.noteSources = it } },
+                onMorning = { morning = it; vm.store.morningSummary = it },
+                onOpenAccess = { startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) },
+                onOpenAppInfo = { startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.parse("package:$packageName"))) },
+                onClear = { noteStore.clear(); notesTick++ },
+            )
+        }
+        val ttsEngines = remember { installedEngines(this) }
         var bargeIn by remember { mutableStateOf(vm.store.bargeIn) }
         var wakeOverMusic by remember { mutableStateOf(vm.store.wakeOverMusic) }
         var speechModel by remember { mutableStateOf(vm.store.speechModel) }
@@ -288,6 +307,11 @@ class MainActivity : ComponentActivity() {
             onWakeName = { wakeName = it; vm.store.wakeName = it; restartListening() },
             overlayAllowed = Settings.canDrawOverlays(this),
             onlineCommands = onlineCommands, onOnlineCommands = { onlineCommands = it; vm.store.onlineCommands = it },
+            googleTalk = googleTalk, onGoogleTalk = { googleTalk = it; vm.store.googleTalk = it },
+            quickCommands = quickCommands, onQuickCommands = { quickCommands = it; vm.store.quickCommands = it },
+            notes = notesUi,
+            ttsEngines = ttsEngines, ttsEngine = ttsEngine,
+            onTtsEngine = { ttsEngine = it; vm.store.ttsEngine = it; voice.resetSpeech(); restartListening() },
             bargeIn = bargeIn, onBargeIn = { bargeIn = it; vm.store.bargeIn = it; restartListening() },
             wakeOverMusic = wakeOverMusic, onWakeOverMusic = { wakeOverMusic = it; vm.store.wakeOverMusic = it },
             speechModel = speechModel, hasIndianModel = hasIndianModel, onSpeechModel = { speechModel = it; vm.store.speechModel = it; restartListening() },

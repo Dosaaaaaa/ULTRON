@@ -11,6 +11,7 @@ import android.content.pm.ServiceInfo
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.SystemClock
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.core.app.NotificationCompat
@@ -18,7 +19,9 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.ultron.assistant.BuildConfig
 import com.ultron.assistant.R
+import com.ultron.assistant.core.AppCommand
 import com.ultron.assistant.core.Followups
+import com.ultron.assistant.core.QuickCommands
 import com.ultron.assistant.core.WakeWord
 import com.ultron.assistant.data.Store
 import com.ultron.assistant.ui.Voice
@@ -63,7 +66,8 @@ class HandsFreeService : Service() {
         if (BuildConfig.DEBUG && running && intent?.action == ACTION_DEBUG_HEAR) {
             // Debug builds only (see DebugCommandReceiver): feeds text in as if the recogniser had heard it.
             val text = intent.getStringExtra("text").orEmpty()
-            if (intent.getBooleanExtra("final", false)) onHeard(text) else onPartial(text)
+            if (intent.getBooleanExtra("settled", false)) onSettled(text)
+            else if (intent.getBooleanExtra("final", false)) onHeard(text) else onPartial(text)
             return START_NOT_STICKY
         }
         Notifier.channels(this)
@@ -82,7 +86,7 @@ class HandsFreeService : Service() {
             listener = VoskListener(this)
             listener.load(
                 indian = Store(this).speechModel == "in",
-                onReady = { HandsFreeStatus.set(true, "Listening for “$shown”"); listener.start(::onHeard, { fail(it) }, ::onPartial, Store(this).bargeIn) },
+                onReady = { HandsFreeStatus.set(true, "Listening for “$shown”"); listener.start(::onHeard, { fail(it) }, ::onPartial, Store(this).bargeIn, ::onSettled) },
                 onFail = { fail(it) },
             )
         }
@@ -129,6 +133,25 @@ class HandsFreeService : Service() {
         if (after != null && after.isBlank()) main.postDelayed(nameOnly, 450) // else: a command is following, wait for it
     }
 
+    // ---- quick commands: "pause", "next", "louder" run when the words are exactly that AND the speaker has gone quiet,
+    // not after the recogniser's longer end-of-sentence pause (measured: 0 wrong fires in 36 clips, 0.5-0.8 s sooner).
+    private var firedQuick: AppCommand? = null
+    private var firedAt = 0L
+
+    private fun onSettled(words: String) = main.post {
+        if (!running || busy || listeningOnline || !Store(this).quickCommands) return@post
+        val said = if (awaitingCommand) words else WakeWord.match(words, wake, aliases) ?: return@post
+        val cmd = QuickCommands.parse(said) ?: return@post
+        firedQuick = cmd; firedAt = SystemClock.uptimeMillis()
+        if (BuildConfig.DEBUG) android.util.Log.i("UltronDebug", "quick command ran: $cmd")
+        val wasAwaiting = awaitingCommand
+        main.removeCallbacks(nameOnly); main.removeCallbacks(giveUp)
+        awaitingCommand = false
+        listener.setPatient(false)
+        listener.reset() // the rest of this sentence is not wanted: no second result for it
+        runCommand(said, wasAwaiting)
+    }
+
     /** Where the words that were not in the last running text begin (one back: the last word is often rewritten). */
     private fun newWords(text: String): Int {
         val from = maxOf(0, seen - 1)
@@ -162,7 +185,7 @@ class HandsFreeService : Service() {
         main.postDelayed(giveUp, if (Store(this).onlineCommands) 16000 else 9000)
         HandsFreeStatus.text = "Listening for “$shown” · heard you, waiting for your command"
         val store = Store(this)
-        val next = { if (running) { if (store.onlineCommands && voice.available()) listenOnline() else listener.pause(false) } }
+        val next = { if (running) { if (store.onlineCommands && voice.googleAvailable()) listenOnline() else listener.pause(false) } }
         if (store.soundOnWake) {
             // Do not listen while it plays (it would hear itself); resetting also drops the half-heard name.
             listener.pause(true)
@@ -184,6 +207,7 @@ class HandsFreeService : Service() {
             onPartial = { p -> main.post { if (HandsFreeStatus.showHeard) HandsFreeStatus.heard = p } },
             onText = { t -> main.post { backOffline(); if (running && myTurn == turn) handleHeard(t) } },
             onError = { _, _ -> main.post { backOffline() } },
+            forceGoogle = true, // this switch means Google's recogniser, whatever the microphone button uses
         )
     }
 
@@ -200,6 +224,13 @@ class HandsFreeService : Service() {
         if (!running) return
         if (HandsFreeStatus.showHeard) HandsFreeStatus.heard = heard
         main.removeCallbacks(nameOnly)
+        firedQuick?.let { fired ->
+            firedQuick = null
+            if (SystemClock.uptimeMillis() - firedAt < 3000 && QuickCommands.sameAs(fired, WakeWord.match(heard, wake, aliases) ?: heard)) {
+                if (BuildConfig.DEBUG) android.util.Log.i("UltronDebug", "final result of the quick command dropped")
+                return
+            }
+        }
         val from = newWords(heard)
         seen = 0 // a sentence ended
         var named = WakeWord.match(heard, wake, aliases)
@@ -236,23 +267,27 @@ class HandsFreeService : Service() {
         val myTurn = ++turn
         // With "speak over it" on, the microphone stays open (echo-cancelled) so the name can interrupt the reply.
         if (!Store(this).bargeIn) listener.pause(true)
-        router.handle(command) { r -> main.post { if (myTurn == turn) speakAndFinish(r.text, r.stop, myTurn, r.listenAgain, r.quiet) } }
+        router.handle(command) { r -> main.post { if (myTurn == turn) speakAndFinish(r.text, r.stop, myTurn, r.listenAgain, r.quiet, r.silent) } }
     }
 
     /** [quiet]: the operator asked for the music to stop, so it must not come back when the turn ends. */
-    private fun speakAndFinish(text: String, stop: Boolean, forTurn: Int, listenAgain: Boolean = false, quiet: Boolean = false) {
+    private fun speakAndFinish(text: String, stop: Boolean, forTurn: Int, listenAgain: Boolean = false, quiet: Boolean = false, silent: Boolean = false) {
         if (stop) { Store(this).handsFree = false; voice.speak(text) { stopSelf() }; return }
-        saysName = WakeWord.late(text, wake, aliases)
-        voice.speak(text) {
-            if (forTurn != turn) return@speak
-            busy = false
-            saysName = false
-            if (!running) return@speak
-            listener.reset()
-            seen = 0
-            if (!Store(this).bargeIn) listener.pause(false)
-            if (listenAgain) cueListening() else if (quiet) focus.releaseQuiet() else focus.release()
+        val finish = {
+            if (forTurn == turn) {
+                busy = false
+                saysName = false
+                if (running) {
+                    listener.reset()
+                    seen = 0
+                    if (!Store(this).bargeIn) listener.pause(false)
+                    if (listenAgain) cueListening() else if (quiet) focus.releaseQuiet() else focus.release()
+                }
+            }
         }
+        if (silent) { finish(); return } // the action was the answer: nothing to say
+        saysName = WakeWord.late(text, wake, aliases)
+        voice.speak(text) { finish() }
     }
 
     /** Nothing was said after the chime: stop waiting and let the music carry on. */

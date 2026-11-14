@@ -23,8 +23,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk { abiFilters += listOf("arm64-v8a", "x86_64") } // Vosk ships 4 CPU variants; phones are arm64, the emulator x86_64
         targetSdk = 35
-        versionCode = 9
-        versionName = "1.6.0"
+        versionCode = 11
+        versionName = "1.8.0"
     }
 
     signingConfigs {
@@ -82,9 +82,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.0")
     implementation("androidx.compose.material:material-icons-core")
-    implementation("androidx.fragment:fragment:1.8.8") // the code scanner pulls in a very old Fragment
-    // Scans the pairing QR code with no camera permission of our own (Google Play services).
-    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
     // Offline speech engine for hands-free: listens with no beep, no network and no restart gaps.
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")

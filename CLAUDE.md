@@ -4,8 +4,9 @@ Modular, secure, voice-first personal AI (FastAPI backend + PySide6 desktop + vo
 Built in phases; **the user approves each phase before the next starts.**
 
 ## Read first
-- `memory.md`: full hand-off context (rules, state of every phase, measurements, pending items).
-- `docs/PLAN_PHASE_5.md`: current plan (security module, pairing/push, desktop background mode, Kotlin phone app).
+- `memory.md`: full hand-off context. **Section 0 first**: state today and the current plan (steps J1 to J6, approved as a
+  plan, not built). Sections 1 to 20 are older history.
+- `docs/PLAN_PHASE_5.md`: the finished plan of the last stage (background only).
 - `docs/INDEX.md`: map of the other docs. Do not load them all.
 
 ## Hard rules

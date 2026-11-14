@@ -7,18 +7,23 @@ import android.media.AudioManager
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.ultron.assistant.data.NoteStore
 import com.ultron.assistant.data.Store
 import com.ultron.assistant.service.Chime
 import com.ultron.assistant.service.Focus
 import com.ultron.assistant.service.HandsFreeService
+import com.ultron.assistant.service.NoteIngest
 import com.ultron.assistant.service.VoiceRouter
 
 /** adb shell am broadcast -n com.ultron.assistant/.DebugCommandReceiver --es text "open settings"
  *  Logs the sentence ULTRON would say back under the tag UltronDebug. Special texts:
  *    __chime__                      plays the chime
  *    __focus_hold__ / __focus_release__ / __focus_quiet__   what a hands-free turn does to other apps' music
+ *    __note__ pkg|title|text        offers a notification to the reader (counts only are logged)
+ *    __morning__ / __notes_clear__  reads the morning summary / forgets all kept notes
  *    __handsfree_on__               turns the hands-free setting on (open the app to start listening)
- *    __partial__ words / __heard__ words   feeds words to the running hands-free service as if it heard them */
+ *    __partial__ words / __heard__ words   feeds words to the running hands-free service as if it heard them
+ *    __settled__ words              the same, as if the speaker had also gone quiet (quick commands) */
 class DebugCommandReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val text = intent.getStringExtra("text") ?: return
@@ -30,12 +35,19 @@ class DebugCommandReceiver : BroadcastReceiver() {
             text == "__focus_hold__" -> { Log.i("UltronDebug", "before hold: music playing=${music()}"); focus(app).hold(); later("after hold") }
             text == "__focus_release__" -> { focus(app).release(); later("after release") }
             text == "__focus_quiet__" -> { focus(app).releaseQuiet(); later("after quiet release") }
+            text.startsWith("__note__ ") -> text.removePrefix("__note__ ").split("|", limit = 3).let { p ->
+                val kept = NoteIngest.offer(app, p[0], p.getOrElse(1) { "" }, p.getOrElse(2) { "" }, System.currentTimeMillis())
+                val store = NoteStore(app)
+                Log.i("UltronDebug", "note kept=$kept total=${store.all().size} dropped=${store.dropped}")
+            }
+            text == "__morning__" -> NoteIngest.speakMorning(app) { Log.i("UltronDebug", "morning said=[$it]") }
+            text == "__notes_clear__" -> { NoteStore(app).clear(); Log.i("UltronDebug", "notes cleared") }
             text == "__handsfree_on__" -> { Store(app).handsFree = true; Log.i("UltronDebug", "hands-free setting on") }
-            text.startsWith("__partial__") || text.startsWith("__heard__") -> app.startService(
+            text.startsWith("__partial__") || text.startsWith("__heard__") || text.startsWith("__settled__") -> app.startService(
                 Intent(app, HandsFreeService::class.java).setAction(HandsFreeService.ACTION_DEBUG_HEAR)
-                    .putExtra("text", text.substringAfter("__ ").trim()).putExtra("final", text.startsWith("__heard__")),
+                    .putExtra("text", text.substringAfter("__ ").trim()).putExtra("final", text.startsWith("__heard__")).putExtra("settled", text.startsWith("__settled__")),
             )
-            else -> VoiceRouter(app) { later -> Log.i("UltronDebug", "later=[$later]") }.handle(text) { r -> Log.i("UltronDebug", "said=[${r.text}] stop=${r.stop} listenAgain=${r.listenAgain} quiet=${r.quiet}") }
+            else -> VoiceRouter(app) { later -> Log.i("UltronDebug", "later=[$later]") }.handle(text) { r -> Log.i("UltronDebug", "said=[${r.text}] stop=${r.stop} listenAgain=${r.listenAgain} quiet=${r.quiet} silent=${r.silent}") }
         }
     }
 

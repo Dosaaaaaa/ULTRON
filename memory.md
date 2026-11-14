@@ -1,7 +1,355 @@
 # ULTRON: project context (hand-off file)
 
-Written 2026-11-12 so a new model/session can pick up without the old conversation.
+Written 2026-11-12 so a new model/session can pick up without the old conversation. **Section 0 was added on
+2026-11-13 and is the newest: read it first and in full.** Sections 1 to 20 are the older history, kept as written.
 Project root: `/home/binu/Projects/AI/ULTRON`. No secrets are in this file; never add any.
+
+## 0. START HERE (2026-11-13): state today and the approved plan for the next stage
+
+The user will continue this project with a different, smaller model. This section is written for that model.
+The user first said "No, don't start building. Make a plan and save it.", then answered the open questions and said "start the project" on 2026-11-13: **J1 (2026-11-14) and J2 (2026-11-15) are built; J3 to J6 are not.**
+
+### 0.1 Prompt to paste into the new chat
+
+```
+You are continuing project ULTRON in /home/binu/Projects/AI/ULTRON.
+Read CLAUDE.md, then section 0 of memory.md in full. It holds the state of the project and the plan I approved.
+Step J1 is built (see "J1 STATUS" in 0.7) and waits for my approval; J2 is built too; J3 to J6 are not. Do not start J3 until I say go.
+First tell me in plain words what you will change and how you will test it, then wait for my "go".
+After building, run the tests, tell me what you checked and what you did not check, and stop.
+I approve each step before the next one starts. Do not print secrets, do not open the microphone,
+do not install anything system-wide without asking, and do not invent test results.
+```
+
+### 0.2 What to read, and in what order
+
+1. `CLAUDE.md` (rules and commands), then this section.
+2. For the step you are on, only the files named in that step (0.7). Do not load all the docs.
+3. `docs/PHASE_5_RESULTS.md`: what was measured on the phone, section "Phone 1.6.0" and "Speed notes" (options A to H).
+4. `docs/DESIGN.md` before any screen change. `shared/protocols/device_push.md` and `chat_ws.md` before any change to
+   how the phone and the computer talk.
+5. Knowledge graph first, hand search second: `graphify query "<question>" --budget 1500` from the project root
+   (graph updated 2026-11-13: 4663 nodes, 11666 edges, 196 named communities; report `graphify-out/GRAPH_REPORT.md`).
+   This edit of `memory.md` is newer than the graph; `/graphify . --update` refreshes it (one document to re-read).
+6. Sections 13 to 20 below when you need the history of the phone app; `docs/PLAN_PHASE_5.md` is the finished plan
+   of the last stage (background only).
+
+### 0.3 The story so far, in short
+
+- By 2026-11-12: backend (FastAPI, local model + Groq cloud model, personality, memory), voice client, desktop window
+  with the blue orb, device agent (approved folders and apps, approval dialogs, hash-chained log), reasoning pass, web
+  search (still off: no provider configured), benchmark, security module, a full code review with 10 fixes.
+- 2026-11-12: Phase 5. The phone pairs with the computer (single-use code or QR, pinned certificate, hashed device token
+  with a capability table: `chat`, `notify`, `call`), push socket, reminders, call proposals. Kotlin phone app built and
+  tested on the user's phone (Motorola edge 50 fusion, Android 16).
+- 2026-11-13: design system and screen rebuild; the phone app made to work on its own (reminders, calls, app control
+  without the computer); hands-free mode with the offline wake name "Friday" (Vosk); versions 1.1.0 to 1.6.0.
+- 2026-11-13: 1.6.0 installed on the phone: the name is heard over music, the music pauses and comes back, and a song
+  request is checked against what really plays. The project was uploaded to a private GitHub repository. The knowledge
+  graph was updated. The user then described the goal for the next stage and accepted the plan in 0.7.
+
+### 0.4 State today (checked 2026-11-13)
+
+- Git: branch `main`, last commit `47c347f`. Since then UNCOMMITTED: the plan text, all J1 work, and a `.gitignore` fix (the old bare `data/` rule had kept the app's `data/` package, `Store.kt` and two more files, out of the repository; the GitHub copy does not build until they are committed). Private repository:
+  https://github.com/Dosaaaaaa/ULTRON (account `Dosaaaaaa`). Commit or push only when the user asks.
+- Phone: app 1.7.0 (J1) is installed on the user's phone; 1.8.0 (J2) is built and signed but NOT installed. Details of the 1.7.0 install (2026-11-14, user approved J1; adb `-t <transport id>` worked while the serial with spaces did not). `minSdk 26`, `targetSdk 35`. Sources: `android/app/src/main/java/com/ultron/assistant/`
+  with `core/` (parsers and rules, plain Kotlin, unit-tested), `data/`, `net/`, `service/`, `ui/`.
+- Phone permissions today: calls, contacts, microphone (foreground service), notifications, exact alarms, display over
+  other apps, boot, vibrate, internet. Services: `PushService`, `HandsFreeService`. There is **no** notification
+  listener and **no** accessibility service yet.
+- Google parts, as of 1.7.0: the QR scanner library is GONE (pairing uses the phone's own Camera app); tap-to-talk is
+  offline Vosk by default (Google's is a switch); the speaking voice is whatever text-to-speech engine is installed and
+  chosen in Settings (default: the phone's, which is Google's; an open-source engine such as SherpaTTS or RHVoice is not
+  installed yet). The wake-name listener was already offline (Vosk). Before 1.7.0 this is what the user noticed as
+  "connected to Google in the background".
+- The phone asks the computer with one `POST /v1/chat` and waits for the whole answer (`net/UltronApi.kt`). The backend
+  can already stream words over its WebSocket (`shared/protocols/chat_ws.md`); the phone does not use that yet.
+- Phone and computer talk only on the home Wi-Fi today. The computer needs `~/.config/ultron/tls/{cert,key}.pem`
+  (`bin/ultron phone setup`) and a firewall rule that the user must run (`sudo ufw allow 8443/tcp`, or the narrower
+  rule in 0.8). The phone still needs a fresh pairing code from `bin/ultron pair`.
+- Tests: Android 178 unit tests pass (after J2, 2026-11-15). Python suites: see the line "Baseline" at the end of 0.11.
+- Signing key for the release APK: `~/.config/ultron/android-signing/` (outside the repository; never print the password).
+- adb serial of the phone contains a space and brackets: `adb-ZA222N6CDB-UhM7DO (2)._adb-tls-connect._tcp`. Quote it.
+  Only read-only checks on the phone unless the user asks; never make the phone play music without telling them.
+
+### 0.5 Lines further down that are out of date
+
+- Section 1 table said Phase 5 (Android) was not started. It is built and on the phone (sections 13 to 20).
+- Section 11 gave graph numbers of 2964 nodes. The graph now has 4663 nodes (see 0.2).
+- "Phase 6: model tool-calling" in section 1 and in `docs/INTELLIGENCE.md` is a different, still unbuilt item. The plan
+  below uses step names J1 to J6 so the two are not mixed up. In J1 to J6 the model never starts a tool by itself:
+  code matches the spoken command, and the rules in 0.9 apply.
+- Section 20 says the default wake name was Jarvis, then Friday. Friday is the current default on phone and desktop.
+
+### 0.6 What the user wants (their decisions, close to their words)
+
+- The current app "is actually perfect", but: the delay is better and still noticeable; Settings feels like "so many
+  options" (keep every option, but hide most of them behind an icon so they "pop up later"); it "feels like it's
+  connected to Google or something in the background".
+- Goal: "a fully working Jarvis kind of a thing", done "at least in a medium way". They will give it another name.
+  It should read notifications, have "almost all the control" of the phone, read Teams notifications, and on the
+  computer check files and run the user's own automation scripts. The computer is **Linux** (the user said "windows"
+  and corrected it: "it's not Windows").
+- Morning: after the alarm it should say the summary: "Has someone texted me? Have I got any emails? What's my team's
+  status?" The user also wants to write and send email to anyone by voice.
+- Email: **Gmail only**. "Outlook is there, but I don't want you to go through Outlook."
+- One-time codes and bank messages: "filter those out. I don't want those to be read and all… Those need to be out."
+- Connection: on the same Wi-Fi the two devices talk directly. Away from the Wi-Fi it must still work over the internet
+  "with a maximum security, where like nothing can be accessed to whomever whatsoever", with the chats encrypted so
+  nobody can read them, using "some kind of token which is used in the crypto".
+- Cost: everything must be open source or a free version. "I don't want to pay for anything." It must be fast and the
+  code "as efficient as possible".
+- Graphics card: stays as it is (GTX 1650, 4 GB). An upgrade is the last option only.
+- Order of work: the six steps in 0.7, accepted. Each step still needs the user's "go" and their approval at the end.
+
+### 0.7 The plan: six steps, in this order
+
+For every step: say the plan in plain words and wait for "go"; write tests that fail first; build; run the unit tests;
+check on an emulator where a device is needed (temporary AVD, deleted afterwards, injected text only, never the
+microphone); install on the user's phone only with their OK; report what was and was not verified; update this file and
+`docs/PHASE_5_RESULTS.md`; stop for approval. One step is one app version (J1 = 1.7.0, and so on).
+
+**J1. Tidy the app, make it faster, remove the Google parts**
+- Settings (`ui/Screens.kt`, `SettingsScreen`; today five sections: "Ask before acting", "Hands-free", "Your computer",
+  "Permissions", "This phone"): one short first screen (hands-free on/off, wake name, computer link status) and a "More"
+  icon that opens the rest in collapsed groups. No option is removed. Follow `docs/DESIGN.md`.
+- Speed (letters are the options in `docs/PHASE_5_RESULTS.md`, "Speed notes"):
+  A = act on short fixed commands (pause, next, volume, stop) as soon as the heard words are stable, without waiting
+  for the end of the sentence (estimated 0.5 to 1 s saved; estimate, not measured);
+  G = no spoken "Paused." / "Next." (`service/AppControl.kt`, about line 315), the action itself is the answer;
+  B = the phone reads the answer as a stream and starts speaking the first sentence while the rest arrives
+  (`net/UltronApi.kt`, `service/VoiceRouter.kt`; backend side exists).
+  Options C, D, E, F, H are not chosen; ask before using any of them. Measure before and after and write both down.
+- Replace the three Google parts with open-source ones, each behind the same interface so the old one stays as a
+  switch under "More" (default: the open-source one):
+  tap-to-talk → the bundled Vosk recogniser (weaker than Google's for long free questions; not measured for this use;
+  a later option is to send the audio to whisper.cpp on the computer when it is reachable);
+  speaking voice → an on-device open voice (candidate: Piper through sherpa-onnx; check the licence of the voice
+  file, the APK size and the speed on the phone, none of which is measured);
+  QR scanner → ZXing with CameraX (this adds the CAMERA permission, which the Google scanner did not need).
+- Done when: unit tests pass; the emulator shows the new Settings in light and dark; the measured times are in the
+  results document; with the default switches the APK works with no Google speech or scanner component.
+
+**J1 STATUS (2026-11-14): BUILT, waiting for the user's approval.** Details and all measurements: `docs/PHASE_5_RESULTS.md`
+section "Phone 1.7.0". Done: short Settings with collapsed groups; quick commands behind a quiet-gate (the 250 ms
+"words stable" idea was measured and REJECTED: it fired inside "stop listening"); no spoken "Paused."/"Next."; offline
+tap-to-talk; QR scanner removed; speaking-engine chooser; default wake name **Mercury** (measured against 19 other
+names). NOT done: a bundled open-source voice (reasons in the results doc; the engine chooser is the stand-in) and
+speed option B (streaming answers). Not verified on the real phone: everything audio. 1.7.0 is installed on the phone. Before J2: the user tries it; ask what they saw (name Mercury, quick commands, mic button, pairing via Camera); commit and push
+only when asked (include the `.gitignore` fix and the three `data/` files).
+
+**J2. Reading: "what did I miss?" and the morning summary**
+- Add a `NotificationListenerService`. Only apps on an allow-list are read: Messages (SMS), WhatsApp, Gmail, Teams to
+  start with; the list is editable under "More". Everything else is ignored.
+- The filter in 0.9 runs first, on the phone, before anything is stored. What it removes is not stored, not shown, not
+  spoken and not sent anywhere; only a count is kept.
+- What passes is kept on the phone only, encrypted, for a short time (proposed: 48 hours, with a "clear" command).
+- Commands, matched by code in `core/`: "what did I miss", "any messages", "any emails", "what is my team's status",
+  "read the messages from <name>". The answer is built by code: counts, senders, then the previews if asked.
+- Morning summary: first as a command ("good morning" / "what's the summary"). Then automatic after the alarm: the
+  listener can see the Clock app's alarm notification end; this must be checked on the user's phone before it is promised.
+- No model is needed for counts and senders. A "summarise" request uses the local model on the computer when it is
+  reachable (`privacy: local_only`). Notification text never goes to the cloud model in this stage.
+- Teams: the notification gives sender and a short preview only. Presence, full threads and channels would need
+  Microsoft's Graph API with approval from the company's administrator; that is not part of this plan.
+- Phone setup the user must do once: Settings > Apps > the app > menu > "Allow restricted settings", then grant
+  notification access (needed because the app is not from the Play Store).
+- Done when: unit tests cover the allow-list, the filter (fixed list of sample messages, see 0.9) and the summary text;
+  the emulator shows a posted test notification being counted and an OTP-like one being dropped.
+
+**J2 STATUS (2026-11-15): BUILT, waiting for the user to install it, try it and approve.** App 1.8.0 (versionCode 11), release APK
+built and signed, NOT installed (the user said "go with the building of j2"; installing needs their OK, as with J1). Details,
+what the filter drops, and what was and was not verified: `docs/PHASE_5_RESULTS.md` section "Phone 1.8.0". Files: `core/Notes.kt`
+(filter, log, digest, briefing, commands, morning rule), `data/NoteStore.kt`, `service/NoteIngest.kt`, `service/NotificationReader.kt`,
+Settings group "Notifications". The user must do once on the phone: Settings > Apps > ULTRON > menu > "Allow restricted
+settings", then switch on notification access (the Settings group explains it). Before J3: ask what they saw with REAL
+WhatsApp/Gmail/Teams/SMS notifications (too strict? too loose?) and whether the morning summary fired after the alarm.
+Commit and push only when asked (everything since the plan, J1 and J2 is uncommitted, plus the `.gitignore` fix).
+
+**J3. Sending: email and messages by voice**
+- Always the same flow: say it → the app writes the draft → reads it back → sends only on "send"; "cancel" drops it;
+  "change …" edits it. Nothing is sent without the spoken confirmation. The recipient is read back as well.
+- Email, Gmail only. Two ways, the user picks (open question 2 in 0.12):
+  (a) Gmail's mail server with an "app password" (free; needs 2-step verification on the Google account; about 500
+  mails a day). Fully hands-free. The app password is a secret that can send and read the mailbox: it would be kept in
+  the phone's encrypted storage, never logged, never sent to the computer or the model.
+  (b) no password at all: the app opens Gmail's own compose screen with recipient, subject and text filled in, and the
+  user taps Send (after J6 the tap could be done for them).
+- Text messages: SMS with the phone's own SMS function (new permission `SEND_SMS`). WhatsApp: a reply to a chat that has
+  a notification can be sent through that notification's reply action; a new WhatsApp chat can only be opened with the
+  text filled in, the user taps Send.
+- Recipients come from contacts with the existing sound-alike matching and "did you mean"; an address that was only
+  heard, never seen, must be spelled back before sending.
+- Done when: unit tests cover the draft/confirm/cancel states and recipient matching; on the emulator a mail goes to a
+  local test mail server (not to a real person) and an SMS goes to the emulator's own number.
+
+**J4. Works away from the home Wi-Fi, securely** (research and design in 0.8)
+- Same Wi-Fi: direct, as today. Otherwise: through a private encrypted network (Tailscale, free plan), plus the pinned
+  certificate and device token that exist today, plus a new per-device key that seals and signs every chat message.
+- This step starts with a one-page design note for the user (in `docs/`), because it changes the pairing protocol.
+- The user has to do the system parts themselves (install Tailscale on the laptop and the phone, sign in, firewall
+  rule): give them the exact commands; do not run them.
+- Done when: backend tests cover the new key exchange with test vectors on both sides, a wrong or replayed message is
+  refused, and a real test from the phone on mobile data works (the user does this test).
+
+**J5. Automations on the Linux computer**
+- The user's scripts are registered with the device agent (`desktop/agent/ultron_agent/`: `broker.py` is the single
+  path for every tool call: validate → policy → approval → execute; `registry.py`, `policy.py`, `paths.py`, `audit.py`).
+- A registry file (proposed `~/.config/ultron/automations.toml`) lists for each automation: a spoken name and other
+  phrases, the script path, fixed arguments, a time limit, and the approval rule (ask every time / ask the first time /
+  no question for read-only checks). Rules: the script must lie in an approved folder, belong to the user and not be
+  writable by others; it is started as an argument list, never through a shell; its hash is stored when it is
+  registered, and a changed file needs approval again; its output is trimmed and treated as untrusted text.
+- A command is matched by code against the registered names. The model cannot start a script.
+- From the phone: a new capability (proposed `automation`) on the device token, off by default; the approval question
+  appears on the phone; every run is written to the agent's log.
+- File checks ("is the report in Downloads?", "what is new in <folder>") use the agent's existing file tools inside
+  the approved folders.
+- The computer must be awake. If it is not reachable, the phone says so; it does not queue commands silently.
+- Done when: agent tests cover registration, hash change, refused paths, approval rules and the log; a harmless sample
+  script runs from a test client. The user supplies the real scripts afterwards.
+
+**J6. Wider phone control (last)**
+- Add an `AccessibilityService` for a short list of defined tasks (for example: press Send in the Gmail compose screen,
+  read the text on the current screen, open a named chat). No free roaming by a model.
+- Never inside banking, payment, password, authenticator apps or the security pages of Settings. Paying is never done.
+  Send, call and delete always need the spoken confirmation. A visible sign shows while the service acts.
+- The same "Allow restricted settings" step as J2; newer Android versions add a stricter check for sideloaded apps, so
+  whether the phone lets this service be switched on must be checked before anything is built.
+
+### 0.8 The connection away from Wi-Fi: research (2026-11-13) and the recommended design
+
+Researched on the web on 2026-11-13; nothing was installed or tested. Check the linked pages again before building.
+
+| Option | Free | Open source | Needs from the user | Verdict |
+|---|---|---|---|---|
+| **Tailscale, Personal plan** | yes: 6 users, unlimited own devices, personal use only | apps yes (BSD-3); the coordination service is closed | an account, the app on phone and laptop | **recommended** |
+| Headscale (own coordination server, same apps) | yes | yes, all of it | an always-on server with a public address, kept patched | the fully open path; more work, one more machine to protect |
+| Plain WireGuard | yes | yes | a public address or an open port on the home router | usually not possible: Indian home and mobile lines mostly sit behind the provider's shared address (CGNAT) |
+| NetBird / Nebula / ZeroTier | yes | mostly | NetBird and Nebula self-hosted also need a public server; hosted plans exist | no advantage here over the two above |
+| Cloudflare Tunnel, ngrok and similar | yes | partly | — | **rejected**: they give the backend a public web address and the company in the middle can read the traffic |
+
+What Tailscale does and does not see (from its own documentation): each device makes its own keys and the private key
+never leaves the device; traffic is encrypted from device to device with WireGuard; its relay servers (used when no
+direct path can be made) pass on packets they cannot open; the company's coordination service hands out the public keys
+and sees which devices exist and their internet addresses, but not the content. It reports direct paths more than 90% of
+the time. The remaining trust point, that the coordination service could add a device to the network, is closed by
+"Tailnet Lock": new devices must be signed by a device the user already trusts. Whether Tailnet Lock is on the free
+plan was not checked: check it.
+Costs and side effects: sign-in needs an existing account (GitHub works, so it need not be Google); the phone's single
+VPN slot is used by Tailscale; battery cost on the phone is not measured; the free plan's terms can change.
+
+**Recommended design: three locks, each independent of the others**
+
+1. *Private network.* Tailscale on the laptop and the phone. No port is opened on the home router and the backend has no
+   public address. Never use Funnel, an exit node, a subnet router or Tailscale SSH. In Tailscale's access rules allow
+   only: phone → laptop, TCP 8443. Turn on Tailnet Lock.
+2. *What exists today.* The backend's own TLS with the pinned certificate (`net/PinnedTls.kt`, `core/Fingerprint.kt`)
+   and the hashed device token with its capability table (`backend/app/devices/registry.py`). Unchanged.
+3. *New: a device key, the "crypto token" the user asked for.* It works like a crypto wallet: at pairing the phone
+   creates a key pair inside the Android Keystore (hardware-backed where the phone supports it, not exportable). The
+   computer stores only the public half, and the phone stores the computer's public half; both travel in the pairing
+   QR, which the user scans from the computer's own screen. For each connection both sides make fresh one-time keys,
+   sign them with their long-term keys, and derive message keys from them (a signed Diffie-Hellman exchange, the same
+   idea as in TLS 1.3 and WireGuard). Every chat message is then sealed and numbered; a wrong, repeated or
+   out-of-order message is refused. Effects: a stolen device token alone is useless; breaking the outer layers does not
+   reveal the chats; a key stolen later does not open old chats.
+   Building rules: no home-made cipher. Use only standard parts: on the phone the platform's own crypto (P-256 keys work
+   with hardware backing on all supported versions; X25519 in the Keystore needs Android 13+, and the app's `minSdk` is
+   26, so P-256 is the safe choice or the away-mode needs Android 13+); on the computer the `cryptography` package
+   (would be a new backend dependency: ask). HKDF-SHA256 for the keys, AES-256-GCM or ChaCha20-Poly1305 for sealing.
+   Same test vectors on both sides. Old pairings keep working on Wi-Fi until re-paired.
+
+How the phone picks the path: try the home address first with a short time limit (about 0.3 to 0.5 s), then the
+Tailscale address (100.x, stays the same everywhere). The certificate pin is the same on both. On the computer
+`backend/app/serve.py` listens on the Wi-Fi address today (`--tls-host`); it needs a second listener on the Tailscale
+address. It must never listen on all addresses (`0.0.0.0`). Firewall lines for the user to run (not run by a model):
+`sudo ufw allow in on tailscale0 to any port 8443 proto tcp` and, for home, `sudo ufw allow from <home subnet> to any
+port 8443 proto tcp`.
+
+Lost phone: revoke the device in ULTRON (the registry has `revoked_at`) and remove it in the Tailscale admin page.
+Either one alone already cuts it off.
+
+**Two honest limits to tell the user (already said once, keep saying it):**
+- "Nobody can read the chats" holds for the path between phone and computer. When a question is answered by the cloud
+  model (Groq), Groq receives that question. Only the local model keeps a chat fully on the user's devices. A possible
+  switch: "away from home, use the local model only" (slower). This is open question 1 in 0.12.
+- With WireGuard and the pinned TLS the traffic is already encrypted twice. Lock 3 is the extra the user asked for; it
+  adds proof that the message comes from the user's own phone hardware, and protection if one of the outer layers fails.
+
+Sources: https://tailscale.com/docs/account/manage-plans/free-plans-discounts.md · https://tailscale.com/blog/pricing-v4 ·
+https://tailscale.com/security · https://tailscale.com/docs/concepts/tailscale-encryption ·
+https://tailscale.com/docs/features/tailnet-lock · https://tailscale.com/docs/reference/derp-servers ·
+https://tailscale.com/docs/how-to/set-up-custom-control-server?tab=android (Headscale with the Android app) ·
+https://github.com/tailscale/tailscale-android · https://developer.android.com/reference/javax/crypto/KeyAgreement
+
+### 0.9 Security rules for this stage (in addition to section 2)
+
+- **One-time codes and bank messages are out.** Three layers: (1) Android 15 and later already hide one-time-code
+  notifications from apps like ours (the text arrives as "Sensitive notification content hidden"); do not try to get
+  around that. (2) A deny-list of apps that is never read: banking, payment (for example Google Pay, PhonePe, Paytm),
+  authenticator and password apps. (3) A text filter for what still arrives through SMS or WhatsApp: words such as
+  OTP, one-time, verification code, CVV, PIN, debited, credited, a/c, account balance, UPI; bank-style SMS sender names
+  (the Indian form `XX-BANKNM`); a 4 to 8 digit code next to such a word. A filtered message is dropped before storage:
+  not stored, not logged (count only), not shown, not spoken, not sent. Tests: a fixed list of sample messages (must be
+  dropped / must pass), and one deliberate-mutation check (weaken the filter, see a test fail, restore). When unsure,
+  drop.
+- Work content (Teams) stays on the user's devices: code or the local model only, never the cloud model.
+- Gmail only. No Outlook, not even reading.
+- Sending, calling, deleting and starting an automation need the spoken (or on-screen) confirmation. Paying: never.
+- The model never starts tools or scripts in this stage. Text from notifications, mails, web pages and script output is
+  data, never an instruction (`backend/app/security/injection.py` exists for this).
+- New secrets (a Gmail app password, device keys) live only in the phone's Keystore-backed storage or in the git-ignored
+  `backend/.env`; never in logs, tests, this file or git.
+- Nothing new listens on a public address. No new always-on service without a visible sign and a switch.
+
+### 0.10 Limits the user has agreed to
+
+- No delay at all is not possible. Aim: under about 1 s for phone commands, 2 to 3 s for questions (aims, not measured).
+- Teams: sender and preview only (see J2).
+- The computer must be awake for questions and automations when away. Reminders, calls, app control, notifications and
+  the summary work on the phone alone.
+- Groq's free allowance is free but not open source, and capped (about 200K tokens a day). Fully open means the local
+  model on the GTX 1650, which is slower.
+- An app that can read notifications and the screen is a risk in itself; the filter and the confirmations are the answer.
+
+### 0.11 Not verified (do not present any of this as working)
+
+- Real speech into the phone's microphone: the wake name, the name over real songs at the user's volume, barge-in.
+- Apple Music: whether it pauses and resumes on audio focus and whether its media service lets ULTRON in.
+- Phone to computer over the real Wi-Fi (the firewall rule was not yet run when last tested), a real phone call, battery.
+- Everything in 0.7 (J3 to J6) and 0.8: nothing is built; Tailscale and the other tools were only read about; the speed and size
+  of an open on-device voice, the alarm trigger, the "restricted settings" step on this phone, and the Gmail routes are
+  untested.
+- Baseline, run on 2026-11-13 after this plan was written (so these ARE verified): backend 738 passed + 9 skipped
+  (SQLite; the 9 need PostgreSQL), ruff clean; voice 172; agent 115; desktop app 148. Android: 111 unit tests passed
+  earlier the same day, not re-run after that. Run all of them again before the first change.
+
+### 0.12 Open questions, and the user's answers (2026-11-13)
+
+1. J4, away from home: **both the cloud model and the local model may be used; no "local only" rule.** (The honest
+   limit in 0.8 still stands: a question that goes to Groq is readable by Groq. Keep telling the user which one answered.)
+2. J3, Gmail: **Gmail's own compose screen** (recipient, subject and text filled in, the user taps Send). No app password,
+   no stored secret.
+3. J4: **Tailscale is approved.** The user has no server, so Headscale is out.
+4. J2, allow-list: **WhatsApp, Gmail, Teams** ("those are enough for now"). Messages (SMS) was in the plan and the user
+   wants to know "has someone texted me": keep SMS in unless the user says otherwise. Retention of what was read was not
+   answered: keep the proposed 48 hours.
+5. New name: the user wanted a name other than "Friday" that is easy to recognise far, close and in noise, and left the
+   choice to the model. Chosen by measurement: **Mercury** (docs/PHASE_5_RESULTS.md, "Phone 1.7.0"). The user can still pick
+   another in Settings > More > Voice. The desktop wake name is still "friday" (not evaluated for Whisper).
+6. Still open from before: pairing the phone with the real backend (fresh code from `bin/ultron pair` and the firewall
+   rule), and a first test of 1.6.0 with real speech and Apple Music.
+7. **The user said "start the project" (2026-11-13): J1 is approved to start.** They still approve the end of each step.
+
+### 0.13 How to work with this user
+
+- Plain words, short messages, one topic at a time. Say what was not checked. Ask before each new step.
+- The user tests with the real phone and voice; a model never opens the microphone and never treats an emulator or an
+  offscreen picture as the user's screen.
+- Small changes with tests first; measure before claiming something is faster; keep the code small and efficient.
+- Mistakes already made here, do not repeat them: running `bin/ultron stop` against the user's real backend from a
+  test; leaving a background `adb` command waiting on a wrong serial; quoting a number from a test set that was tuned on.
 
 ## 1. What ULTRON is
 
@@ -16,7 +364,8 @@ Ollama; cloud model is Groq (free allowance about 200K tokens/day, per-minute ca
 | 3 Desktop app (PySide6) + device agent (approved folders/apps, audit log, approval dialogs) | built |
 | 4 Persistent memory (pgvector/SQLite) | built, verified (see section 4) |
 | Text/intelligence upgrade (reasoning pass, web search, benchmark) | built, measured (section 5) |
-| 5 Android | **NOT approved, NOT started** |
+| 5 Android phone app, pairing, push, hands-free | built; app 1.6.0 on the user's phone (sections 13 to 20; real voice untested) |
+| Next stage J1 to J6 (everyday assistant) | **planned in section 0, approved as a plan, NOT built** |
 | 6 Model tool-calling / code execution / device control by the model | not built; needs a permission design first |
 
 Layout:
@@ -213,8 +562,8 @@ embedding model under real voice load, web search with a real provider.
   template files were filled with real content. cto's "98% saving" is its own estimate (it counts docs/*.md as
   auto-loaded); the real session-start cost was not measured. `cto init` also left a clone of its own repo in
   `claude-token-optimizer/` (not mine to delete without asking; excluded in .claudeignore/.graphifyignore).
-- Knowledge graph: `graphify-out/` (graph.html, GRAPH_REPORT.md, graph.json; 2964 nodes, 7884 edges, 127
-  communities; top 40 communities named, the rest are "Community N"). Query with `graphify query "..."`.
+- Knowledge graph: `graphify-out/` (graph.html, GRAPH_REPORT.md, graph.json; at that time 2964 nodes; updated
+  2026-11-13 to 4663 nodes, 11666 edges, 196 named communities). Query with `graphify query "..."`.
   Rebuild after big changes with `/graphify . --update`. Folder is git-ignored.
 - References cloned only into the session scratchpad (AbuZar-Ansarii/Ultron: no LICENSE file -> ideas only;
   open-jarvis/openjarvis: Apache-2.0). Nothing from them was run or copied.

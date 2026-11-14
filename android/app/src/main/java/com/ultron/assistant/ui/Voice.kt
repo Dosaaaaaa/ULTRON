@@ -17,6 +17,7 @@ import android.provider.Settings
 import com.ultron.assistant.core.RecognizerService
 import com.ultron.assistant.core.ServiceChoice
 import com.ultron.assistant.core.SpeechErrors
+import com.ultron.assistant.core.TtsEngines
 import java.util.Locale
 
 /** Push-to-talk. The microphone is open only while the button is held, and Android shows its own
@@ -31,18 +32,32 @@ private const val RecognitionServiceAction = "android.speech.RecognitionService"
 class Voice(private val context: Context) {
     private val main = Handler(Looper.getMainLooper())
     private var recognizer: SpeechRecognizer? = null
+    private val offline by lazy { OfflineDictation(context) }
+    private var usingOffline = false
     private var tts: TextToSpeech? = null
     private var ttsReady = false
     private var pendingSpeech: String? = null
 
-    fun available(): Boolean =
+    private fun google() = com.ultron.assistant.data.Store(context).googleTalk
+
+    /** Android's own recogniser (Google's, or the phone maker's) is installed. */
+    fun googleAvailable(): Boolean =
         SpeechRecognizer.isRecognitionAvailable(context) ||
             (Build.VERSION.SDK_INT >= 33 && SpeechRecognizer.isOnDeviceRecognitionAvailable(context))
 
+    fun available(): Boolean = (!google() && offline.available()) || googleAvailable()
+
     /** Start listening. [onPartial] shows words as they are recognised; exactly one of [onText] or
      *  [onError] is called at the end. */
-    fun listen(onPartial: (String) -> Unit, onText: (String) -> Unit, onError: (String, String?) -> Unit) {
+    fun listen(onPartial: (String) -> Unit, onText: (String) -> Unit, onError: (String, String?) -> Unit, forceGoogle: Boolean = false) {
         teardown()
+        // Default: the offline recogniser on the phone. Google's is used only when the operator switched it on
+        // (Settings > Voice), or when the offline model is not in this build.
+        usingOffline = !forceGoogle && !google() && offline.available()
+        if (usingOffline) {
+            offline.listen(com.ultron.assistant.data.Store(context).speechModel == "in", onPartial, onText) { onError(it, null) }
+            return
+        }
         start(preferOnDevice = false, onPartial, onText, onError)
     }
 
@@ -124,13 +139,14 @@ class Voice(private val context: Context) {
     /** The button was released: ask the recogniser to finish and deliver. It is destroyed when it
      *  answers, or after a few seconds if it never does. */
     fun release() {
+        if (usingOffline) { offline.release(); return }
         val r = recognizer ?: return
         r.stopListening()
         main.postDelayed({ if (recognizer === r) teardown() }, 6000)
     }
 
     /** Abandon any attempt in progress (a new one is starting, or the screen is closing). */
-    fun cancel() = teardown()
+    fun cancel() { if (usingOffline) offline.cancel(); teardown() }
 
     private fun teardown() {
         val r = recognizer ?: return
@@ -145,7 +161,7 @@ class Voice(private val context: Context) {
         doneCallback = onDone
         if (tts == null) {
             pendingSpeech = text
-            tts = TextToSpeech(context.applicationContext) { status ->
+            tts = TextToSpeech(context.applicationContext, { status ->
                 ttsReady = status == TextToSpeech.SUCCESS
                 if (ttsReady) {
                     tune()
@@ -158,10 +174,16 @@ class Voice(private val context: Context) {
                     pendingSpeech?.let { tts?.speak(it, TextToSpeech.QUEUE_FLUSH, null, "reply") }
                 } else main.post { finishSpeech() }
                 pendingSpeech = null
-            }
+            }, TtsEngines.choose(com.ultron.assistant.data.Store(context).ttsEngine, installedEngines(context).map { it.second }))
         } else if (ttsReady) {
             tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "reply")
         } else main.post { finishSpeech() }
+    }
+
+    /** The engine setting changed: the next reply is spoken by the new engine. */
+    fun resetSpeech() {
+        runCatching { tts?.shutdown() }
+        tts = null; ttsReady = false; pendingSpeech = null
     }
 
     /** Cut a reply off mid-sentence (the operator spoke over it). The finish callback is dropped. */
@@ -189,10 +211,20 @@ class Voice(private val context: Context) {
     }
 
     fun shutdown() {
+        if (usingOffline) offline.shutdown()
         teardown()
         main.removeCallbacksAndMessages(null)
         tts?.shutdown()
         tts = null
     }
 
+}
+
+/** Installed text-to-speech engines as (label, package). */
+fun installedEngines(context: Context): List<Pair<String, String>> {
+    val pm = context.packageManager
+    return pm.queryIntentServices(Intent("android.intent.action.TTS_SERVICE"), 0).mapNotNull { ri ->
+        val si = ri.serviceInfo ?: return@mapNotNull null
+        (ri.loadLabel(pm)?.toString() ?: si.packageName) to si.packageName
+    }.distinctBy { it.second }
 }

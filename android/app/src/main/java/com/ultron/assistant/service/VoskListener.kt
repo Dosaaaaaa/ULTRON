@@ -7,6 +7,8 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.media.audiofx.AcousticEchoCanceler
 import android.media.audiofx.NoiseSuppressor
+import com.ultron.assistant.core.QuickCommands
+import com.ultron.assistant.core.QuietTracker
 import org.json.JSONObject
 import org.vosk.Model
 import org.vosk.Recognizer
@@ -26,6 +28,8 @@ class VoskListener(private val context: Context) {
     private var onText: (String) -> Unit = {}
     private var onFail: (String) -> Unit = {}
     private var onPartial: (String) -> Unit = {}
+    private var onSettled: (String) -> Unit = {}
+    private val quiet = QuietTracker()
     private var echoCancel = true
 
     @Volatile private var running = false
@@ -42,9 +46,10 @@ class VoskListener(private val context: Context) {
     }
 
     /** Calls [onText] with every finished utterance (a pause ends one) and [onPartial] with words so far. */
-    fun start(onText: (String) -> Unit, onFail: (String) -> Unit, onPartial: (String) -> Unit = {}, echoCancel: Boolean = true) {
+    fun start(onText: (String) -> Unit, onFail: (String) -> Unit, onPartial: (String) -> Unit = {}, echoCancel: Boolean = true, onSettled: (String) -> Unit = {}) {
         val m = model ?: return onFail("model not loaded")
-        this.onText = onText; this.onFail = onFail; this.onPartial = onPartial; this.echoCancel = echoCancel
+        this.onText = onText; this.onFail = onFail; this.onPartial = onPartial; this.echoCancel = echoCancel; this.onSettled = onSettled
+        quiet.reset()
         recognizer = Recognizer(m, 16000f)
         openMic()
     }
@@ -65,18 +70,22 @@ class VoskListener(private val context: Context) {
             ar.startRecording()
             val buf = ShortArray(1600) // 100 ms
             var last = ""
+            var settledFor = ""
             while (running) {
                 val n = ar.read(buf, 0, buf.size)
                 if (n < 0) { onFail("microphone error"); break }
                 if (n == 0 || paused) continue
-                if (resetRequested) { resetRequested = false; rec.reset(); last = "" }
+                if (resetRequested) { resetRequested = false; rec.reset(); last = ""; settledFor = ""; quiet.reset() }
+                quiet.feed(rms(buf, n))
                 if (patient != appliedPatient) { appliedPatient = patient; rec.setEndpointerMode(if (patient) 2 else 0) }
                 if (rec.acceptWaveForm(buf, n)) {
-                    last = ""
+                    last = ""; settledFor = ""
                     text(rec.result)?.let(onText)
                 } else {
                     val p = partial(rec.partialResult)
                     if (p != null && p != last) { last = p; onPartial(p) }
+                    // The speaker has gone quiet while the recogniser still waits for its own, longer, pause.
+                    if (last.isNotEmpty() && last != settledFor && quiet.settled(QuickCommands.SETTLE_CHUNKS)) { settledFor = last; onSettled(last) }
                 }
             }
         } catch (e: RuntimeException) {
@@ -86,6 +95,12 @@ class VoskListener(private val context: Context) {
             effects.forEach { runCatching { it.release() } }
             ar.release()
         }
+    }
+
+    private fun rms(buf: ShortArray, n: Int): Float {
+        var sum = 0.0
+        for (i in 0 until n) sum += buf[i].toDouble() * buf[i]
+        return Math.sqrt(sum / maxOf(1, n)).toFloat()
     }
 
     /** Voice-communication first (echo cancelling), plain voice recognition if the phone refuses it. */
@@ -135,6 +150,14 @@ class VoskListener(private val context: Context) {
         resetRequested = true
         openMic()
     }
+
+    /** Stop listening but keep the model loaded for the next time (the microphone button uses this). */
+    fun idle() {
+        releaseMic()
+        recognizer?.close(); recognizer = null
+    }
+
+    val loaded: Boolean get() = model != null
 
     fun stop() {
         releaseMic()

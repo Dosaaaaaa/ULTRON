@@ -2,7 +2,9 @@
 .env
 .env.*
 !.env.example
-data/
+# runtime data only (NOT the Android source package android/.../data/)
+/backend/data/
+/data/
 *.db
 *.db-journal
 *.sqlite3

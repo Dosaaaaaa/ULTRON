@@ -6,9 +6,14 @@ package com.ultron.assistant.core
  *  The offline recogniser (Vosk, small English model) only writes words it knows. "Ultron" is not one
  *  of them, so it is never heard correctly; [CHOICES] are names that are in its vocabulary. */
 object WakeWord {
-    /** Names measured to work with the offline recogniser (see docs/PHASE_5_RESULTS.md). */
-    val CHOICES = listOf("Friday", "Jarvis", "Computer", "Nova", "Orion", "Athena")
-    const val DEFAULT = "Friday"
+    /** Names measured to work with the offline recogniser (see docs/PHASE_5_RESULTS.md, "Phone 1.7.0"). */
+    val CHOICES = listOf("Mercury", "Sentinel", "Friday", "Jarvis", "Computer", "Nova", "Orion", "Athena")
+    const val DEFAULT = "Mercury"
+
+    /** App 1.7.0 changed the default from "Friday" (too well known, and weak in noise) to "Mercury". Returns the name
+     *  to store once, for a phone still on the old default or with none chosen; null when nothing should change. */
+    fun migrate(stored: String?, alreadyDone: Boolean): String? =
+        if (alreadyDone) null else if (stored == null || stored.equals("Friday", ignoreCase = true)) DEFAULT else null
 
     private val lead = setOf("hey", "hi", "hello", "okay", "ok", "yo", "oh")
     private val ultron = Regex("^[uao][aeiou]?l+t+r[aeiouh]{0,3}n$")

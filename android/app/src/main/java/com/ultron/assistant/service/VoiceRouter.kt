@@ -18,6 +18,8 @@ import com.ultron.assistant.core.Followups
 import com.ultron.assistant.core.MediaKey
 import com.ultron.assistant.core.Pending
 import com.ultron.assistant.core.Push
+import com.ultron.assistant.core.QuickCommands
+import com.ultron.assistant.core.ReadCommands
 import com.ultron.assistant.core.Spoken
 import com.ultron.assistant.data.ContactsReader
 import com.ultron.assistant.data.LocalReminders
@@ -34,8 +36,9 @@ import java.util.concurrent.Executors
  *  next thing said, without the wake name, is the answer ([Followups]). */
 class VoiceRouter(private val context: Context, onLater: (String) -> Unit = {}) {
     /** [listenAgain]: a question was asked, so the microphone should open for the answer.
-     *  [quiet]: the music was asked to stop, so it must stay stopped after the answer. */
-    data class Said(val text: String, val stop: Boolean = false, val listenAgain: Boolean = false, val quiet: Boolean = false)
+     *  [quiet]: the music was asked to stop, so it must stay stopped after the answer.
+     *  [silent]: the action is the answer, so [text] is not spoken. */
+    data class Said(val text: String, val stop: Boolean = false, val listenAgain: Boolean = false, val quiet: Boolean = false, val silent: Boolean = false)
 
     private val io = Executors.newSingleThreadExecutor()
     private val apps = AppControl(context, onLater) { Store(context).musicApp }
@@ -78,11 +81,12 @@ class VoiceRouter(private val context: Context, onLater: (String) -> Unit = {}) 
             is Command.Unclear -> return if (cmd.retry != null && tries < 3) ask(cmd.why, cmd.retry, tries) else Said(cmd.why)
             null -> Unit
         }
+        ReadCommands.parse(text)?.let { return Said(NoteIngest.answer(context, it)) }
         return when (val app = AppCommands.parse(text) ?: return null) {
             is AppCommand.Timer -> if (app.seconds <= 0) ask("For how long?", "set a timer for", tries) else Said(apps.run(app))
             is AppCommand.Alarm -> if (app.hour < 0) ask("For what time?", "set an alarm for", tries) else Said(apps.run(app))
             is AppCommand.TextMessage -> textMessage(app)
-            else -> Said(apps.run(app), stop = app is AppCommand.StopListening, quiet = app == AppCommand.Media(MediaKey.PAUSE))
+            else -> Said(apps.run(app), stop = app is AppCommand.StopListening, quiet = app == AppCommand.Media(MediaKey.PAUSE), silent = store.quickCommands && QuickCommands.silent(app))
         }
     }
 

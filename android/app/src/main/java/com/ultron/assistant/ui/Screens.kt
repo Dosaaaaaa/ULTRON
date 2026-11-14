@@ -33,8 +33,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -53,6 +56,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +73,7 @@ import com.ultron.assistant.R
 import com.ultron.assistant.core.Display
 import com.ultron.assistant.core.Fingerprint
 import com.ultron.assistant.core.ReminderItem
+import com.ultron.assistant.core.SettingsSummary
 import com.ultron.assistant.data.Pairing
 import java.time.Instant
 import java.time.ZoneId
@@ -80,7 +85,7 @@ fun PairScreen(
     busy: Boolean,
     error: String?,
     defaultName: String,
-    onScan: () -> Unit,
+    onOpenCamera: () -> Unit,
     onManual: (address: String, code: String, fingerprint: String, name: String) -> Unit,
     onBack: (() -> Unit)? = null,
 ) {
@@ -103,13 +108,13 @@ fun PairScreen(
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("1.  On your computer, open ULTRON and choose Phone.", style = MaterialTheme.typography.bodyMedium)
             Text("2.  Create a pairing code. A QR code appears.", style = MaterialTheme.typography.bodyMedium)
-            Text("3.  Scan it here.", style = MaterialTheme.typography.bodyMedium)
+            Text("3.  Open the Camera below, point it at the QR code and tap the link that appears.", style = MaterialTheme.typography.bodyMedium)
         }
-        Button(onClick = onScan, enabled = !busy, modifier = Modifier.fillMaxWidth().height(56.dp)) {
-            Text(if (busy) "Pairing…" else "Scan QR code", style = MaterialTheme.typography.titleMedium)
+        Button(onClick = onOpenCamera, enabled = !busy, modifier = Modifier.fillMaxWidth().height(56.dp)) {
+            Text(if (busy) "Pairing…" else "Open the Camera", style = MaterialTheme.typography.titleMedium)
         }
         error?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium) }
-        TextButton(onClick = { manual = !manual }) { Text(if (manual) "Hide manual entry" else "No camera? Enter the details by hand") }
+        TextButton(onClick = { manual = !manual }) { Text(if (manual) "Hide manual entry" else "Camera does not open the link? Enter the details by hand") }
         if (manual) {
             OutlinedTextField(address, { address = it }, label = { Text("Server address") }, singleLine = true, modifier = Modifier.fillMaxWidth())
             OutlinedTextField(code, { code = it.uppercase() }, label = { Text("Pairing code") }, placeholder = { Text("ABCD-EFGH") }, singleLine = true, modifier = Modifier.fillMaxWidth())
@@ -344,6 +349,20 @@ private fun AddReminderDialog(onDismiss: () -> Unit, onAdd: (String, Instant) ->
 }
 
 // ====================================================================== settings
+/** Everything the Notifications group of Settings shows and does. */
+data class NotesUi(
+    val access: Boolean,
+    val sources: Set<String>,
+    val morning: Boolean,
+    val kept: Int,
+    val dropped: Int,
+    val onSource: (String, Boolean) -> Unit,
+    val onMorning: (Boolean) -> Unit,
+    val onOpenAccess: () -> Unit,
+    val onOpenAppInfo: () -> Unit,
+    val onClear: () -> Unit,
+)
+
 data class PermissionRow(val title: String, val why: String, val granted: Boolean, val onAllow: () -> Unit)
 
 @Composable
@@ -371,6 +390,14 @@ fun SettingsScreen(
     overlayAllowed: Boolean,
     onlineCommands: Boolean,
     onOnlineCommands: (Boolean) -> Unit,
+    googleTalk: Boolean,
+    onGoogleTalk: (Boolean) -> Unit,
+    quickCommands: Boolean,
+    onQuickCommands: (Boolean) -> Unit,
+    notes: NotesUi,
+    ttsEngines: List<Pair<String, String>>,
+    ttsEngine: String,
+    onTtsEngine: (String) -> Unit,
     bargeIn: Boolean,
     onBargeIn: (Boolean) -> Unit,
     wakeOverMusic: Boolean,
@@ -390,21 +417,18 @@ fun SettingsScreen(
     version: String,
 ) {
     var confirm by remember { mutableStateOf(false) }
+    var more by rememberSaveable { mutableStateOf(false) }
+    var openGroup by rememberSaveable { mutableStateOf("") }
+    val missing = permissions.filter { !it.granted }
+    val toggle = { g: String -> openGroup = if (openGroup == g) "" else g }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Orb(if (connected) OrbMode.Online else OrbMode.Offline, 72.dp)
-            Column(Modifier.padding(start = 12.dp)) {
+            Column(Modifier.weight(1f).padding(start = 12.dp)) {
                 Text(if (pairing == null) "On this phone" else if (connected) "Connected to your computer" else "Computer not reachable", style = MaterialTheme.typography.titleLarge)
                 Text(if (pairing == null) "Reminders and calls work here. Connect for AI answers." else if (connected) "Live connection" else detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-        }
-        Section("Ask before acting") {
-            SwitchRow("Confirm before calling", if (confirmCalls) "ULTRON shows the number and waits for your tap on Call." else "ULTRON calls by itself after a 3-second countdown you can cancel. Names are only called when exactly one contact matches.", confirmCalls, onConfirmCalls)
-            if (!confirmCalls && !canAutoDial) Text("Allow Phone calls and Contacts below, or it will still ask.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            SwitchRow("Pick a time when it is vague", if (guessTimes) "“Remind me tomorrow” is set for 9:00 and “at 5” for the next 5 o'clock, without asking." else "ULTRON asks what you meant when a reminder time is vague.", guessTimes, onGuessTimes)
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            SwitchRow("Read answers aloud after I speak", if (speakReplies) "When you use the microphone, ULTRON answers out loud." else "ULTRON answers in text only.", speakReplies, onSpeakReplies)
+            IconButton(onClick = { more = !more }) { Icon(Icons.Filled.Settings, if (more) "Hide more settings" else "More settings") }
         }
         Section("Hands-free") {
             SwitchRow(
@@ -425,50 +449,8 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            SwitchRow("Chime when it hears the name", if (soundOnWake) "A short rising sound means “I heard you, speak now”." else "No sound; the phone gives a tiny buzz instead.", soundOnWake, onSoundOnWake)
-            OutlinedButton(onClick = onPlaySound) { Text("Play the chime") }
-            if (musicApps.isNotEmpty()) {
-                Text("Music app for “play …”", style = MaterialTheme.typography.labelLarge)
-                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    androidx.compose.material3.FilterChip(selected = musicApp.isEmpty(), onClick = { onMusicApp("") }, label = { Text("Automatic") })
-                    musicApps.forEach { (label, pkg) ->
-                        androidx.compose.material3.FilterChip(selected = musicApp == pkg, onClick = { onMusicApp(pkg) }, label = { Text(label) })
-                    }
-                }
-            }
-            SwitchRow(
-                "Understand names and songs better",
-                if (onlineCommands) "After you say the name, your command is heard by Google's speech recogniser (better with accents, contact names and song titles). Only that command's audio is sent; the listening for the name stays on the phone."
-                else "Off: everything is understood on the phone. Small offline recognisers often mishear song titles and names; turn this on if “play …” or “call …” gets them wrong.",
-                onlineCommands, onOnlineCommands,
-            )
-            SwitchRow("Say the name to interrupt", if (bargeIn) "Say “$wakeName” while it is talking and it stops and listens. Uses the phone's echo cancelling." else "It finishes speaking before it listens again.", bargeIn, onBargeIn)
-            SwitchRow(
-                "Hear the name over music",
-                if (wakeOverMusic) "While music is playing, “$wakeName” is picked out of whatever is heard; the music pauses, you speak after the chime, and it carries on afterwards. A song or video that says “$wakeName” can set it off."
-                else "While music is playing, the name is only heard in a gap in the sound.",
-                wakeOverMusic, onWakeOverMusic,
-            )
-            if (hasIndianModel) {
-                Text("Offline speech model", style = MaterialTheme.typography.labelLarge)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    androidx.compose.material3.FilterChip(selected = speechModel != "in", onClick = { onSpeechModel("us") }, label = { Text("US English") })
-                    androidx.compose.material3.FilterChip(selected = speechModel == "in", onClick = { onSpeechModel("in") }, label = { Text("Indian English") })
-                }
-            }
-            OutlinedButton(onClick = onTrain) { Text(if (trainedCount > 0) "Train my voice again ($trainedCount learned)" else "Train my voice") }
-            Text("Wake name", style = MaterialTheme.typography.labelLarge)
-            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                com.ultron.assistant.core.WakeWord.CHOICES.forEach { n ->
-                    androidx.compose.material3.FilterChip(selected = n.equals(wakeName, true), onClick = { onWakeName(n) }, label = { Text(n) })
-                }
-            }
-            Text("These names are in the offline listener's vocabulary, so they are recognised reliably. “Ultron” is not, which is why it kept being missed.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            if (!overlayAllowed) {
-                Text("To let voice commands open apps by themselves, allow “Display over other apps”. Without it, a notification asks for one tap.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                OutlinedButton(onClick = onOverlay) { Text("Allow opening apps") }
-            }
         }
+        if (missing.isNotEmpty()) Section("Needs your OK") { PermissionRows(missing) }
         Section("Your computer") {
             if (pairing == null) {
                 Text("Not connected. Reminders and calls do not need it; AI answers do.", style = MaterialTheme.typography.bodyMedium)
@@ -479,26 +461,140 @@ fun SettingsScreen(
                     if (pairing.fingerprint != null) "Encrypted. Only the certificate ${Fingerprint.pretty(pairing.fingerprint).take(23)}… is trusted." else "Not encrypted (debug build only).",
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            }
+        }
+        if (!more) {
+            OutlinedButton(onClick = { more = true }, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                Icon(Icons.Filled.Settings, null, Modifier.size(18.dp))
+                Text("More settings", Modifier.padding(start = 8.dp))
+            }
+        } else {
+            Group("Calls and reminders", SettingsSummary.calls(confirmCalls), openGroup == "calls", { toggle("calls") }) {
+                SwitchRow("Confirm before calling", if (confirmCalls) "ULTRON shows the number and waits for your tap on Call." else "ULTRON calls by itself after a 3-second countdown you can cancel. Names are only called when exactly one contact matches.", confirmCalls, onConfirmCalls)
+                if (!confirmCalls && !canAutoDial) Text("Allow Phone calls and Contacts below, or it will still ask.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                SwitchRow("Pick a time when it is vague", if (guessTimes) "“Remind me tomorrow” is set for 9:00 and “at 5” for the next 5 o'clock, without asking." else "ULTRON asks what you meant when a reminder time is vague.", guessTimes, onGuessTimes)
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                SwitchRow("Read answers aloud after I speak", if (speakReplies) "When you use the microphone, ULTRON answers out loud." else "ULTRON answers in text only.", speakReplies, onSpeakReplies)
+            }
+            Group("Voice and wake name", SettingsSummary.voice(wakeName, soundOnWake), openGroup == "voice", { toggle("voice") }) {
+                SwitchRow("Chime when it hears the name", if (soundOnWake) "A short rising sound means “I heard you, speak now”." else "No sound; the phone gives a tiny buzz instead.", soundOnWake, onSoundOnWake)
+                OutlinedButton(onClick = onPlaySound) { Text("Play the chime") }
+                if (musicApps.isNotEmpty()) {
+                    Text("Music app for “play …”", style = MaterialTheme.typography.labelLarge)
+                    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        androidx.compose.material3.FilterChip(selected = musicApp.isEmpty(), onClick = { onMusicApp("") }, label = { Text("Automatic") })
+                        musicApps.forEach { (label, pkg) ->
+                            androidx.compose.material3.FilterChip(selected = musicApp == pkg, onClick = { onMusicApp(pkg) }, label = { Text(label) })
+                        }
+                    }
+                }
+                SwitchRow(
+                    "Understand names and songs better",
+                    if (onlineCommands) "After you say the name, your command is heard by Google's speech recogniser (better with accents, contact names and song titles). Only that command's audio is sent; the listening for the name stays on the phone."
+                    else "Off: everything is understood on the phone. Small offline recognisers often mishear song titles and names; turn this on if “play …” or “call …” gets them wrong.",
+                    onlineCommands, onOnlineCommands,
+                )
+                SwitchRow(
+                    "Use Google for the microphone button",
+                    if (googleTalk) "The microphone button in this app uses Android's speech recogniser (Google's). It understands long sentences better, and the audio goes to Google."
+                    else "Off: the microphone button listens on the phone with the offline recogniser. Nothing leaves the phone; long free sentences are understood less well.",
+                    googleTalk, onGoogleTalk,
+                )
+                if (ttsEngines.isNotEmpty()) {
+                    Text("Speaking voice engine", style = MaterialTheme.typography.labelLarge)
+                    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        androidx.compose.material3.FilterChip(selected = ttsEngine.isEmpty(), onClick = { onTtsEngine("") }, label = { Text("Phone default") })
+                        ttsEngines.forEach { (label, pkg) ->
+                            androidx.compose.material3.FilterChip(selected = ttsEngine == pkg, onClick = { onTtsEngine(pkg) }, label = { Text(label) })
+                        }
+                    }
+                    Text(
+                        "Replies are spoken by this engine, not by ULTRON. Google's engine sends the text of each reply to Google; an open-source engine (for example SherpaTTS or RHVoice from F-Droid) speaks on the phone.",
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                SwitchRow(
+                    "Act on short commands sooner",
+                    if (quickCommands) "“Pause”, “next”, “previous”, “louder” and “quieter” run as soon as you stop talking, without waiting for the listener's longer pause, and are not announced aloud. If one ever runs before you finish a sentence, switch this off."
+                    else "Every command waits for the listener's end-of-sentence pause, and pause, next and volume are confirmed aloud.",
+                    quickCommands, onQuickCommands,
+                )
+                SwitchRow("Say the name to interrupt", if (bargeIn) "Say “$wakeName” while it is talking and it stops and listens. Uses the phone's echo cancelling." else "It finishes speaking before it listens again.", bargeIn, onBargeIn)
+                SwitchRow(
+                    "Hear the name over music",
+                    if (wakeOverMusic) "While music is playing, “$wakeName” is picked out of whatever is heard; the music pauses, you speak after the chime, and it carries on afterwards. A song or video that says “$wakeName” can set it off."
+                    else "While music is playing, the name is only heard in a gap in the sound.",
+                    wakeOverMusic, onWakeOverMusic,
+                )
+                if (hasIndianModel) {
+                    Text("Offline speech model", style = MaterialTheme.typography.labelLarge)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        androidx.compose.material3.FilterChip(selected = speechModel != "in", onClick = { onSpeechModel("us") }, label = { Text("US English") })
+                        androidx.compose.material3.FilterChip(selected = speechModel == "in", onClick = { onSpeechModel("in") }, label = { Text("Indian English") })
+                    }
+                }
+                OutlinedButton(onClick = onTrain) { Text(if (trainedCount > 0) "Train my voice again ($trainedCount learned)" else "Train my voice") }
+                Text("Wake name", style = MaterialTheme.typography.labelLarge)
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    com.ultron.assistant.core.WakeWord.CHOICES.forEach { n ->
+                        androidx.compose.material3.FilterChip(selected = n.equals(wakeName, true), onClick = { onWakeName(n) }, label = { Text(n) })
+                    }
+                }
+                Text("These names are in the offline listener's vocabulary, so they are recognised reliably. “Ultron” is not, which is why it kept being missed.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (!overlayAllowed) {
+                    Text("To let voice commands open apps by themselves, allow “Display over other apps”. Without it, a notification asks for one tap.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    OutlinedButton(onClick = onOverlay) { Text("Allow opening apps") }
+                }
+            }
+            Group("Notifications", SettingsSummary.notifications(notes.access, notes.kept), openGroup == "notes", { toggle("notes") }) {
+                Text(
+                    if (notes.access) "Notification access is on. Ask “what did I miss?”, “any messages?”, “any emails?”, “what's my team's status?” or “read the messages from Asha”."
+                    else "Not allowed yet. ULTRON cannot see any notification until you allow it.",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                if (!notes.access) {
+                    Text(
+                        "Because ULTRON was installed from a file, Android first needs “Allow restricted settings”: open ULTRON's app settings, tap the ⋮ menu at the top right, choose Allow restricted settings, then come back and open notification access.",
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    OutlinedButton(onClick = notes.onOpenAppInfo) { Text("Open ULTRON's app settings") }
+                }
+                OutlinedButton(onClick = notes.onOpenAccess) { Text(if (notes.access) "Notification access settings" else "Open notification access") }
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                com.ultron.assistant.core.Source.entries.forEach { s ->
+                    val title = when (s) {
+                        com.ultron.assistant.core.Source.SMS -> "Text messages"
+                        com.ultron.assistant.core.Source.WHATSAPP -> "WhatsApp"
+                        com.ultron.assistant.core.Source.EMAIL -> "Gmail"
+                        com.ultron.assistant.core.Source.TEAMS -> "Teams"
+                    }
+                    SwitchRow(title, if (s == com.ultron.assistant.core.Source.TEAMS) "Sender and a short preview only. Presence and team status are not visible." else "Who wrote, and a short preview.", s.key in notes.sources) { notes.onSource(s.key, it) }
+                }
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                SwitchRow(
+                    "Read the summary after my alarm",
+                    if (notes.morning) "When you dismiss your morning alarm (between 4 am and noon, once a day) ULTRON says what you missed. It depends on your Clock app; it has not been tried on every phone."
+                    else "Off. You can still say “good morning” or “what's the summary?”.",
+                    notes.morning, notes.onMorning,
+                )
+                Text(
+                    "One-time codes, security messages, bank and payment messages and business senders are dropped on the phone before anything is stored: not kept, not shown, not spoken, not sent anywhere. What is kept stays on this phone, encrypted, for 48 hours, and is never sent to the cloud model. Apps that are not listed here are never read.",
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text("Kept now: ${notes.kept}.  Dropped so far: ${notes.dropped}.", style = MaterialTheme.typography.bodySmall)
+                OutlinedButton(onClick = notes.onClear, enabled = notes.kept > 0 || notes.dropped > 0) { Text("Clear what it has read") }
+            }
+            if (pairing != null) Group("Computer link", SettingsSummary.computer(true, connected), openGroup == "link", { toggle("link") }) {
                 SwitchRow("Keep a connection open in the background", "Needed for notifications from your computer. Android shows a small notification while it runs.", keepConnected, onKeepConnected)
                 OutlinedButton(onClick = onBattery) { Text("Battery settings") }
             }
-        }
-        Section("Permissions") {
-            permissions.forEachIndexed { i, p ->
-                if (i > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) {
-                        Text(p.title, style = MaterialTheme.typography.bodyLarge)
-                        Text(p.why, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    if (p.granted) Text("Allowed", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelLarge)
-                    else OutlinedButton(onClick = p.onAllow) { Text("Allow") }
-                }
+            Group("Permissions", SettingsSummary.permissions(missing.size, permissions.size), openGroup == "perms", { toggle("perms") }) { PermissionRows(permissions) }
+            if (pairing != null) Group("This phone", "Disconnect from the computer", openGroup == "phone", { toggle("phone") }) {
+                Text("Also remove it on your computer (Phone panel) to cut it off completely.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                OutlinedButton(onClick = { confirm = true }, colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text("Disconnect from this computer") }
             }
-        }
-        if (pairing != null) Section("This phone") {
-            Text("Also remove it on your computer (Phone panel) to cut it off completely.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            OutlinedButton(onClick = { confirm = true }, colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text("Disconnect from this computer") }
+            TextButton(onClick = { more = false; openGroup = "" }, modifier = Modifier.align(Alignment.CenterHorizontally)) { Text("Fewer settings") }
         }
         Text("ULTRON $version", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(8.dp))
@@ -518,6 +614,41 @@ private fun Section(title: String, content: @Composable () -> Unit) {
         Text(title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
         Surface(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
+        }
+    }
+}
+
+@Composable
+private fun PermissionRows(rows: List<PermissionRow>) {
+    rows.forEachIndexed { i, p ->
+        if (i > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(p.title, style = MaterialTheme.typography.bodyLarge)
+                Text(p.why, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            if (p.granted) Text("Allowed", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelLarge)
+            else OutlinedButton(onClick = p.onAllow) { Text("Allow") }
+        }
+    }
+}
+
+/** A settings group that shows only its title and one line until it is opened. */
+@Composable
+private fun Group(title: String, summary: String, open: Boolean, onToggle: () -> Unit, content: @Composable () -> Unit) {
+    Surface(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
+        Column {
+            Row(
+                Modifier.fillMaxWidth().clickable(onClickLabel = if (open) "Close $title" else "Open $title", onClick = onToggle).padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+                    Text(summary, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Icon(if (open) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown, null)
+            }
+            if (open) Column(Modifier.padding(start = 14.dp, end = 14.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
         }
     }
 }
