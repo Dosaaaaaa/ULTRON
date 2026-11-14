@@ -50,9 +50,9 @@ do not install anything system-wide without asking, and do not invent test resul
 
 ### 0.4 State today (checked 2026-11-13)
 
-- Git: branch `main`, last commit `47c347f`. Since then UNCOMMITTED: the plan text, all J1 work, and a `.gitignore` fix (the old bare `data/` rule had kept the app's `data/` package, `Store.kt` and two more files, out of the repository; the GitHub copy does not build until they are committed). Private repository:
+- Git: branch `main`, pushed to the private repo (commit f9fb77e holds the plan, J1, J2 and the `.gitignore` fix: the old bare `data/` rule had kept the app's `data/` package, `Store.kt` and two more files, out of the repository until then). Private repository:
   https://github.com/Dosaaaaaa/ULTRON (account `Dosaaaaaa`). Commit or push only when the user asks.
-- Phone: app 1.7.0 (J1) is installed on the user's phone; 1.8.0 (J2) is built and signed but NOT installed. Details of the 1.7.0 install (2026-11-14, user approved J1; adb `-t <transport id>` worked while the serial with spaces did not). `minSdk 26`, `targetSdk 35`. Sources: `android/app/src/main/java/com/ultron/assistant/`
+- Phone: app 1.8.0 (J2, which includes J1's 1.7.0) is installed on the user's phone. Details of the 1.7.0 install (2026-11-14, user approved J1; adb `-t <transport id>` worked while the serial with spaces did not). `minSdk 26`, `targetSdk 35`. Sources: `android/app/src/main/java/com/ultron/assistant/`
   with `core/` (parsers and rules, plain Kotlin, unit-tested), `data/`, `net/`, `service/`, `ui/`.
 - Phone permissions today: calls, contacts, microphone (foreground service), notifications, exact alarms, display over
   other apps, boot, vibrate, internet. Services: `PushService`, `HandsFreeService`. There is **no** notification
@@ -157,14 +157,14 @@ only when asked (include the `.gitignore` fix and the three `data/` files).
 - Done when: unit tests cover the allow-list, the filter (fixed list of sample messages, see 0.9) and the summary text;
   the emulator shows a posted test notification being counted and an OTP-like one being dropped.
 
-**J2 STATUS (2026-11-15): BUILT, waiting for the user to install it, try it and approve.** App 1.8.0 (versionCode 11), release APK
-built and signed, NOT installed (the user said "go with the building of j2"; installing needs their OK, as with J1). Details,
+**J2 STATUS (2026-11-15): BUILT and INSTALLED on the phone (user approved the install); waiting for them to try it and approve.** App 1.8.0 (versionCode 11), release APK
+built, signed and installed. Details,
 what the filter drops, and what was and was not verified: `docs/PHASE_5_RESULTS.md` section "Phone 1.8.0". Files: `core/Notes.kt`
 (filter, log, digest, briefing, commands, morning rule), `data/NoteStore.kt`, `service/NoteIngest.kt`, `service/NotificationReader.kt`,
 Settings group "Notifications". The user must do once on the phone: Settings > Apps > ULTRON > menu > "Allow restricted
 settings", then switch on notification access (the Settings group explains it). Before J3: ask what they saw with REAL
 WhatsApp/Gmail/Teams/SMS notifications (too strict? too loose?) and whether the morning summary fired after the alarm.
-Commit and push only when asked (everything since the plan, J1 and J2 is uncommitted, plus the `.gitignore` fix).
+Committed and pushed on 2026-11-15 as f9fb77e (with the `.gitignore` fix); commit and push later work only when asked.
 
 **J3. Sending: email and messages by voice**
 - Always the same flow: say it → the app writes the draft → reads it back → sends only on "send"; "cancel" drops it;
